@@ -13,18 +13,17 @@
             <a th:href="@{/recetas}" class="btn btn-primary">Ver Recetas</a>
             <a th:href="@{/planificador}" class="btn btn-success">Planificar Semana</a>
             <a th:href="@{/compras}"  class="btn btn-warning">Lista de Compras</a>
-            <a href="/loggin" class="btn btn-warning">Iniciar sesión</a>
-
             <form th:action="@{/logout}" method="POST" id="logoutForm">
                 <div sec:authorize="hasAnyRole('admin')"><a class="btn btn-warning" href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesion</a></div>
             </form>
         </div>
+        <!-- <p style="font-size: 16px; color: red;" th:text="${}">[username]</p> -->
         <!-- <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/admin/}">Añadir</a></div>
         <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/compras/}">Añadir</a></div>
         <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/recetas/}">Añadir</a></div>
         <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/planificador/}">Añadir</a></div>     -->
 
-
+        
          
     </div>
 </body>

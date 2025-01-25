@@ -1,12 +1,16 @@
-package es.dsw.app.controllers;
+package es.dsw.controllers;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+
 @Controller
 @SessionAttributes({"DataUser"})
 public class MainController {
+
+    
 	
 	@GetMapping(value= {"/loggin"})
 	public String loggin() {
@@ -16,9 +20,10 @@ public class MainController {
 
 	@GetMapping(value= {"/","/index"})
 	public String idx() {
-		
+        
 		return "index";
 	}
+
     @GetMapping("/recetas")
     public String mostrarRecetas() {
         // Por ahora, redirigimos a una página vacía

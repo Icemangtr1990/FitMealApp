@@ -1,4 +1,4 @@
-package es.dsw.app.connections;
+package es.dsw.connections;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -129,6 +129,7 @@ public class MySqlConnection {
 			  this.connection = DriverManager.getConnection("jdbc:mysql://"+this.host+":"+this.puerto+"/"+this.nameDB, this.usuario, this.password);
 			  //Se indica si se realizará autocomit (cada operación será independiente) o si se estará en modo de transacción (delega en la capa de datos el commit).
 			  this.connection.setAutoCommit(this.autocomit);
+			  System.out.println("Open conexion");
 			}
 		}
 		catch (ClassNotFoundException ex)
@@ -168,6 +169,7 @@ public class MySqlConnection {
 				if (!this.connection.isClosed()) {
 					java.sql.Statement objStament = this.connection.createStatement();	
 					ResultSet rs = objStament.executeQuery (_sql);
+					System.out.println("Select");
 					return rs;
 				}
 				else {
