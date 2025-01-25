@@ -1,0 +1,80 @@
+<!-- <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Búsqueda de Recetas</title>
+</head>
+<body>
+  <div class="search-container">
+    <h1>Buscar Recetas</h1>
+    <form action="#" th:action="@{/buscar}" method="get">
+      <input type="text" name="query" placeholder="Buscar recetas..." id="search-input" th:value="${query}">
+      <button type="submit" id="search-btn">Buscar</button>
+    </form>
+
+    <div class="filters">
+      <select name="category" id="category-filter">
+        <option value="all" th:selected="${category == 'all'}">Todas</option>
+        <option value="vegetarian" th:selected="${category == 'vegetarian'}">Vegetariana</option>
+        <option value="vegan" th:selected="${category == 'vegan'}">Vegana</option>
+        <option value="gluten-free" th:selected="${category == 'gluten-free'}">Sin gluten</option>
+      </select>
+    </div>
+
+    
+    <h2>Ver todas las recetas</h2>
+    <div class="recipe-results">
+      <ul>
+        <li th:each="recipe : ${allRecipes}">
+          <a th:href="@{/recetas/{id}(id=${recipe.id})}">
+            <img th:src="@{${recipe.imageUrl}}" alt="Imagen de receta">
+            <h3 th:text="${recipe.name}"></h3>
+            <p th:text="${recipe.description}"></p>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    
+    <h2>Resultados de la búsqueda:</h2>
+    <div th:if="${recipes.size() > 0}">
+      <ul>
+        <li th:each="recipe : ${recipes}">
+          <a th:href="@{/recetas/{id}(id=${recipe.id})}">
+            <img th:src="@{${recipe.imageUrl}}" alt="Imagen de receta">
+            <h3 th:text="${recipe.name}"></h3>
+            <p th:text="${recipe.description}"></p>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div th:if="${recipes.size() == 0}">
+      <p>No se encontraron recetas.</p>
+    </div>
+  </div>
+</body>
+</html>
+ -->
+<!-- Página de Recetas -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" id="recetas">
+        <h1>Recetas</h1>
+        <p>Explora y guarda tus recetas favoritas:</p>
+        <ul>
+            <li>Receta 1</li>
+            <li>Receta 2</li>
+            <li>Receta 3</li>
+        </ul>
+        <button class="btn-warning">Nueva Receta</button>
+    </div>
+</body>
+</html>
