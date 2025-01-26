@@ -14,9 +14,22 @@
             <a th:href="@{/planificador}" class="btn btn-success">Planificar Semana</a>
             <a th:href="@{/compras}"  class="btn btn-warning">Lista de Compras</a>
             <form th:action="@{/logout}" method="POST" id="logoutForm">
-                <div sec:authorize="hasAnyRole('admin')"><a class="btn btn-warning" href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesion</a></div>
+                <div sec:authorize="hasAnyRole('admin','usuario')"><a class="btn btn-warning" href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesion</a></div>
             </form>
+
+            <div class="text-center mt-4" sec:authorize="hasAnyRole('usuario')"><a th:href="@{#}">Area usuario</a></div>
         </div>
+
+        <p class="text-center mt-4">
+            Usuario autenticado: <span th:text="${usuario}">[username]</span>
+        </p>
+
+        <p class="text-center mt-4">
+            Rol: <span th:text="${rol}">[username]</span>
+        </p>
+        <p class="text-center mt-4">
+            Id: <span th:text="${idUsuario}">[username]</span>
+        </p>
         <!-- <p style="font-size: 16px; color: red;" th:text="${}">[username]</p> -->
         <!-- <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/admin/}">Añadir</a></div>
         <div class="text-center mt-4" sec:authorize="hasRole('admin')"><a th:href="@{/compras/}">Añadir</a></div>

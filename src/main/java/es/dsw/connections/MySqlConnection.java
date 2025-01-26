@@ -200,6 +200,12 @@ public class MySqlConnection {
 		
 		return null; 
 	}
+
+	// Método para obtener la conexión actual
+public Connection getConnection() {
+    return this.connection;
+}
+
 	
 	//Método para ejecutar un insert. Devuelve la/s claves primarias generadas en un record set.
 	public ResultSet executeInsert(String _sql) {

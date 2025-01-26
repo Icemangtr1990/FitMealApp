@@ -29,7 +29,10 @@ public class SecurityConfiguration {
 				    			  .requestMatchers("/css/**").permitAll()
 				    			  .requestMatchers("/index").permitAll()
 				    			  .requestMatchers("/loggin").permitAll()
-				    			  .requestMatchers("/index/**").hasRole("admin")
+								  .requestMatchers("/recetas/**").permitAll()
+								  .requestMatchers("/agregarReceta").permitAll()
+								  .requestMatchers("/agregarReceta/**").hasRole("admin")
+				    			  .requestMatchers("/index/**").permitAll()
 				    			  .anyRequest().authenticated()
 				                 )
 		   .httpBasic(withDefaults())
@@ -65,6 +68,7 @@ public class SecurityConfiguration {
 		 		               .build();
 		 InMeory.createUser(user);
 			System.out.println(usuario.getNombre());
+			System.out.println(usuario.getUserRole());
 
 		}
 		return InMeory;
@@ -72,51 +76,4 @@ public class SecurityConfiguration {
 	
 }
 
-			
-	// 	@SuppressWarnings("deprecation")
-	//  	UserDetails maria = User.withDefaultPasswordEncoder()
-	//  			                .username("maria")
-	//  			                .password("1234")
-	//  			                .roles("admin")
-	//  			                .build();
-		
-	//  	@SuppressWarnings("deprecation")
-	// 	UserDetails pedro = User.withDefaultPasswordEncoder()
-	// 			                .username("pedro")
-	//  			                .password("5678")
-	//  			                .roles("secretario")
-	//  			                .build();
-		
-		
 	
-	
-		
-			
-	//  	InMeory.createUser(maria);
-	//  	InMeory.createUser(pedro);
-					
-	//  	return InMeory;
-	//  }
-
-	// @Bean
-	// InMemoryUserDetailsManager userDetailsService() 
-	// { 
-	// 	InMemory =  new InMemoryUserDetailsManager(); 
-		
-	// 	ArrayList<Users> objListaUsuarios  = new Users().getUser();	
-		
-	// 	for(Users usuario : objListaUsuarios) {
-			
-			
-
-	// 		@SuppressWarnings("deprecation")
-	// 		UserDetails user = User.withDefaultPasswordEncoder()
-	// 							   .username(usuario.getNombre())
-	// 							   .password(usuario.getPasswd())
-	// 							   .roles(usuario.getUserRole())
-	// 				               .build();
-	// 		InMemory.createUser(user);
-	// 	}	
-		
-	// 	return InMemory;
-	// }

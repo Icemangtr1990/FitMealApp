@@ -1,5 +1,6 @@
 package es.dsw.models;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,45 +39,10 @@ public class Users {
     public int getIdUser() { return idUser; }
     public void setIdUser(int idUser) { this.idUser = idUser; }
 
-
-    // Obtener todos los usuarios
-    // public ArrayList<Users> getUser() {
-    //     String sql = "SELECT nombre AS NOMBRE, "
-    //                + "contraseña AS CONTRASEÑA,  "
-    //                +  "email AS EMAIL , rol AS ROL"
-    //                + "FROM recetas_app.usuarios";
-        
-    //     ArrayList<Users> objListaUsuarios = new ArrayList<>();
-    //     objMySqlConnection.open();
-        
-
-    //     if (!objMySqlConnection.isError()) {
-    //         ResultSet result = objMySqlConnection.executeSelect(sql);
-    //         System.out.println(result);
-    //         try {
-    //             while (result.next()) {
-    //                 Users objUsuario = new Users();
-                                      
-    //                 objUsuario.setPasswd(result.getString("CONTRASEÑA"));
-    //                 objUsuario.setNombre(result.getString("NOMBRE"));                  
-    //                 objUsuario.setEmail(result.getString("EMAIL"));
-    //                 objUsuario.setUserRole(result.getString("ROL"));
-    //                 objListaUsuarios.add(objUsuario);
-    //             }
-    //         } catch (SQLException e) {
-    //             e.printStackTrace();
-    //         } finally {
-                
-    //             objMySqlConnection.close();
-    //         }
-    //     }
-    //     System.out.println("objListaUsuarios");
-    //     return objListaUsuarios;
-        
-    // }
+ 
 
     public ArrayList<Users> getUser() {
-        String sql = "SELECT nombre AS NOMBRE, contraseña AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
+        String sql = "SELECT nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
         
         ArrayList<Users> objListaUsuarios = new ArrayList<>();
         objMySqlConnection.open();
@@ -106,6 +72,65 @@ public class Users {
         }
         return objListaUsuarios;
     }
+
+    // public int obtenerIdUsuarioPorUsername(String username) {
+    //     int idUsuario = -1; // Valor por defecto si no se encuentra el usuario
+    //     String sql = "SELECT id_usuario FROM usuarios WHERE nombre = ?";
+        
+    //     objMySqlConnection.open(); // Abre la conexión a la base de datos
+    //     if (!objMySqlConnection.isError()) {
+    //         try {
+    //             ResultSet rs = objMySqlConnection.executeSelect(sql);
+    //             if (rs != null && rs.next()) {
+    //                 idUsuario = rs.getInt("id_usuario");
+    //             }
+    //         } catch (SQLException e) {
+    //             e.printStackTrace();
+    //         } finally {
+    //             objMySqlConnection.close();
+    //         }
+    //     } else {
+    //         System.out.println("Error en la conexión: " + objMySqlConnection.msgError());
+    //     }
+    //     return idUsuario; // Retorna el ID del usuario
+    // }
+
+    public Users getUserByUsername(String username) {
+    // Usamos una consulta parametrizada para obtener un solo usuario por su nombre de usuario
+    String sql = "SELECT id_usuario, nombre, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios WHERE nombre = ?";
+    
+    Users objUsuario = null;
+    objMySqlConnection.open();
+    
+    if (!objMySqlConnection.isError()) {
+        try {
+            // Usamos un PreparedStatement para evitar inyecciones SQL
+            PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql);
+            stmt.setString(1, username);  // Seteamos el valor del nombre de usuario
+
+            ResultSet result = stmt.executeQuery();
+            
+            if (result != null && result.next()) {
+                objUsuario = new Users();
+                objUsuario.setIdUser(result.getInt("id_usuario"));
+                objUsuario.setNombre(result.getString("nombre"));
+                objUsuario.setPasswd(result.getString("CONTRASEÑA"));
+                objUsuario.setEmail(result.getString("EMAIL"));
+                objUsuario.setUserRole(result.getString("ROL"));
+            } else {
+                System.out.println("No se encontró el usuario con el nombre: " + username);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
+    } else {
+        System.out.println("Error en conexión: " + objMySqlConnection.msgError());
+    }
+    
+    return objUsuario;
+}
     
 
 
