@@ -2,6 +2,7 @@ package es.dsw.controllers;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -84,35 +86,89 @@ public class MainController {
 
      }
 
-   @GetMapping("/agregarReceta")
-    public String agregarReceta(@RequestParam("nombre") String nombreReceta,
+//    @GetMapping("/agregarReceta")
+//     public String agregarReceta(@RequestParam("nombre") String nombreReceta,
+//                              @RequestParam("descripcion") String descripcion,
+//                              @RequestParam("ingredientes") String ingredientes,
+//                              @RequestParam("instrucciones") String instrucciones,
+//                              @RequestParam(value = "imagen", required = false) String imagen) {
+    
+//     // Crear una nueva instancia de Recetas y setear los valores
+    
+//     // Convertir la lista de ingredientes en formato JSON
+//     // Separar los ingredientes por coma
+//     String[] ingredientesArray = ingredientes.split(","); // Esto convierte la cadena en un array de ingredientes
+
+//     // Crear un JSON con los ingredientes
+//     StringBuilder ingredientesJson = new StringBuilder("{");
+
+//     for (int i = 0; i < ingredientesArray.length; i++) {
+//         // Limpiar los espacios extra de cada ingrediente
+//         String ingrediente = ingredientesArray[i].trim();
+//         ingredientesJson.append("\"ingrediente" + (i + 1) + "\": \"" + ingrediente + "\"");
+        
+//         // Si no es el último ingrediente, añadir coma
+//         if (i < ingredientesArray.length - 1) {
+//             ingredientesJson.append(", ");
+//         }
+//     }
+
+//     // Cerrar el JSON
+//     ingredientesJson.append("}");
+
+//     // Asignar los valores a la receta
+//     Recetas nuevaReceta = new Recetas();
+//     nuevaReceta.setNombreReceta(nombreReceta);
+//     nuevaReceta.setDescripcion(descripcion);
+//     nuevaReceta.setInstrucciones(instrucciones);
+//     nuevaReceta.setIngredientes(ingredientesJson.toString());  // Setear los ingredientes en formato JSON
+//     nuevaReceta.setImagen(imagen != null && !imagen.trim().isEmpty() ? imagen : null);  // Si la imagen está vacía, asignar null
+//     nuevaReceta.setIdUsuario(1);  // Aquí puedes poner el ID del usuario autenticado si lo tienes
+
+//     // Intentar insertar la receta en la base de datos
+//     boolean success = nuevaReceta.insertReceta();
+
+//     if (success) {
+//         // Si la inserción fue exitosa
+//         System.out.println("Receta insertada con éxito ");
+//         return "redirect:/recetas";  // Redirigir a una página de éxito 
+//     } else {
+//         // Si hubo algún error
+//         System.out.println("Error al insertar la receta.");
+//         return "error";  // Redirigir a una página de error (error.html)
+//     }
+// }
+
+@GetMapping("/agregarReceta")
+public String agregarReceta(@RequestParam("nombre") String nombreReceta,
                              @RequestParam("descripcion") String descripcion,
-                             @RequestParam("ingredientes") String ingredientes,
+                             @RequestParam("cantidad") String[] cantidades,  // Recibir un array de cantidades
+                             @RequestParam("ingrediente") String[] ingredientes,  // Recibir un array de ingredientes
                              @RequestParam("instrucciones") String instrucciones,
                              @RequestParam(value = "imagen", required = false) String imagen) {
-    
-    // Crear una nueva instancia de Recetas y setear los valores
-    
-    // Convertir la lista de ingredientes en formato JSON
-    // Separar los ingredientes por coma
-    String[] ingredientesArray = ingredientes.split(","); // Esto convierte la cadena en un array de ingredientes
 
-    // Crear un JSON con los ingredientes
-    StringBuilder ingredientesJson = new StringBuilder("{");
+    // Crear una lista de ingredientes en formato JSON
+    StringBuilder ingredientesJson = new StringBuilder("[");
 
-    for (int i = 0; i < ingredientesArray.length; i++) {
-        // Limpiar los espacios extra de cada ingrediente
-        String ingrediente = ingredientesArray[i].trim();
-        ingredientesJson.append("\"ingrediente" + (i + 1) + "\": \"" + ingrediente + "\"");
+    for (int i = 0; i < cantidades.length; i++) {
+        // Limpiar los espacios extra
+        String cantidad = cantidades[i].trim();
+        String ingrediente = ingredientes[i].trim();
         
+        // Construir cada objeto ingrediente en JSON
+        ingredientesJson.append("{")
+                        .append("\"cantidad\": \"").append(cantidad).append("\", ")
+                        .append("\"ingrediente\": \"").append(ingrediente).append("\"")
+                        .append("}");
+
         // Si no es el último ingrediente, añadir coma
-        if (i < ingredientesArray.length - 1) {
+        if (i < cantidades.length - 1) {
             ingredientesJson.append(", ");
         }
     }
 
     // Cerrar el JSON
-    ingredientesJson.append("}");
+    ingredientesJson.append("]");
 
     // Asignar los valores a la receta
     Recetas nuevaReceta = new Recetas();
@@ -136,6 +192,15 @@ public class MainController {
         return "error";  // Redirigir a una página de error (error.html)
     }
 }
+
+
+@PostMapping("/admin/eliminar-receta")
+public String eliminarReceta(@RequestParam("idReceta") int idReceta) {
+    Recetas receta = new Recetas();
+    receta.eliminarReceta(idReceta);  // Llamamos al método para eliminar la receta
+    return "redirect:/recetas"; // Redirigimos a la lista de recetas
+}
+
     
 
     @GetMapping("/planificador")
@@ -174,6 +239,30 @@ public String crearUsuario(@RequestParam String nombre,
     }
 
     return "redirect:/crearUsuario"; // Redirigir de vuelta al formulario
+}
+
+@GetMapping("/admin/listar-usuarios")
+public String listarUsuarios(Model model) {
+    Users user = new Users();
+    ArrayList<Users> listaUsuarios = user.getUser();  // Obtiene la lista de usuarios
+
+    model.addAttribute("usuarios", listaUsuarios);  // Pasamos los usuarios al modelo
+    return "listar-usuarios";  // Nombre de la vista donde se mostrarán los usuarios
+}
+
+@PostMapping("/admin/eliminar-usuario/{id}")
+public String eliminarUsuario(@PathVariable("id") int idUsuario, RedirectAttributes redirectAttributes) {
+    Users user = new Users();
+    
+    boolean eliminado = user.eliminarUsuario(idUsuario);  // Llamamos al método de eliminación
+    
+    if (eliminado) {
+        redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado correctamente");
+    } else {
+        redirectAttributes.addFlashAttribute("error", "Error al eliminar el usuario");
+    }
+
+    return "redirect:/admin/listar-usuarios";  // Redirigimos a la página de listado de usuarios
 }
 
     

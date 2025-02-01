@@ -41,8 +41,40 @@ public class Users {
 
  
 
+    // public ArrayList<Users> getUser() {
+    //     String sql = "SELECT nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
+        
+    //     ArrayList<Users> objListaUsuarios = new ArrayList<>();
+    //     objMySqlConnection.open();
+    
+    //     if (!objMySqlConnection.isError()) {
+    //         ResultSet result = objMySqlConnection.executeSelect(sql);
+    //         if (result == null) {
+    //             System.out.println("El ResultSet es null. Error en la ejecución de la consulta.");
+    //         } else {
+    //             try {
+    //                 while (result.next()) {
+    //                     Users objUsuario = new Users();
+    //                     objUsuario.setPasswd(result.getString("CONTRASEÑA"));
+    //                     objUsuario.setNombre(result.getString("NOMBRE"));
+    //                     objUsuario.setEmail(result.getString("EMAIL"));
+    //                     objUsuario.setUserRole(result.getString("ROL"));
+    //                     objListaUsuarios.add(objUsuario);
+    //                 }
+    //             } catch (SQLException e) {
+    //                 e.printStackTrace();
+    //             } finally {
+    //                 objMySqlConnection.close();
+    //             }
+    //         }
+    //     } else {
+    //         System.out.println("Error en conexión: " + objMySqlConnection.msgError());
+    //     }
+    //     return objListaUsuarios;
+    // }
+
     public ArrayList<Users> getUser() {
-        String sql = "SELECT nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
+        String sql = "SELECT id_usuario AS ID, nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
         
         ArrayList<Users> objListaUsuarios = new ArrayList<>();
         objMySqlConnection.open();
@@ -55,6 +87,7 @@ public class Users {
                 try {
                     while (result.next()) {
                         Users objUsuario = new Users();
+                        objUsuario.setIdUser(result.getInt("ID")); // Agregamos la asignación del ID
                         objUsuario.setPasswd(result.getString("CONTRASEÑA"));
                         objUsuario.setNombre(result.getString("NOMBRE"));
                         objUsuario.setEmail(result.getString("EMAIL"));
@@ -72,6 +105,7 @@ public class Users {
         }
         return objListaUsuarios;
     }
+    
 
     
 
@@ -132,6 +166,23 @@ public boolean insertUser() {
     }
 
     return false;  // Si hubo error en la inserción
+}
+
+public boolean eliminarUsuario(int idUsuario) {
+    String sql = "DELETE FROM usuarios WHERE id_usuario = " + idUsuario;
+    
+    objMySqlConnection.open();  // Abrir la conexión a la base de datos
+    
+    if (!objMySqlConnection.isError()) {
+        System.out.println(sql);  // Para depuración, muestra la consulta generada
+        objMySqlConnection.executeInsert(sql);  // Ejecutar la eliminación
+        objMySqlConnection.close();  // Cerrar la conexión
+        return true;  // Si la eliminación fue exitosa
+    } else {
+        System.out.println("Error en conexión: " + objMySqlConnection.msgError());
+    }
+    
+    return false;  // Si hubo error al eliminar
 }
 
     

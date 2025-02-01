@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Listado de Usuarios</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h2>Listado de Usuarios</h2>
+
+    <div th:if="${mensaje}" class="mensaje-exito">
+        <p th:text="${mensaje}"></p>
+    </div>
+    <div th:if="${error}" class="mensaje-error">
+        <p th:text="${error}"></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.email}"></td>
+                <td th:text="${usuario.userRole}"></td>
+               
+                <td>
+                    <form th:action="@{/admin/eliminar-usuario/{id}(id=${usuario.idUser})}" method="post">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="/" class="volver-inicio">Volver a Inicio</a>
+</body>
+</html>

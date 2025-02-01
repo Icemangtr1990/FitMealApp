@@ -102,5 +102,24 @@ public class Recetas {
 
     return listaRecetas; // Devolvemos la lista de recetas
 }
+
+
+public boolean eliminarReceta(int idReceta) {
+    String sql = "DELETE FROM recetas WHERE id_receta = " + idReceta;
+
+    objMySqlConnection.open();  // Abrir la conexión
+
+    if (!objMySqlConnection.isError()) {
+        objMySqlConnection.executeInsert(sql);  // Ejecutar eliminación
+        objMySqlConnection.close();  // Cerrar la conexión
+        return true;  // Éxito al eliminar
+    } else {
+        System.out.println("Error al eliminar receta: " + objMySqlConnection.msgError());
+    }
+
+    objMySqlConnection.close();  // Asegurar cierre de conexión
+    return false;  // Fallo al eliminar
+}
+
     
 }

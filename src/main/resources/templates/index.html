@@ -12,13 +12,26 @@
         <div class="text-center mt-4">
             <a th:href="@{/loggin}" class="btn btn-primary">Iniciar sesion</a>
             <a th:href="@{/recetas}" class="btn btn-primary">Ver Recetas</a>
+
+
+            
             <a th:href="@{/planificador}" class="btn btn-success">Planificar Semana</a>
             <a th:href="@{/compras}"  class="btn btn-warning">Lista de Compras</a>
+
             <div sec:authorize="hasRole('admin')">
                 <a th:href="@{/crearUsuario}">
                     <button>Crear Usuario</button>
                 </a>
             </div>
+
+
+            <div sec:authorize="hasRole('admin')">
+                <a th:href="@{/admin/listar-usuarios}">
+                    <button>Ver Usuarios</button>
+                </a>
+            </div>
+
+
             <form th:action="@{/logout}" method="POST" id="logoutForm">
                 <div sec:authorize="hasAnyRole('admin','usuario')"><a class="btn btn-warning" href="#" onclick="document.getElementById('logoutForm').submit();">Cerrar sesion</a></div>
             </form>
