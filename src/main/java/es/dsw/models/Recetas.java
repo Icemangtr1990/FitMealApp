@@ -121,5 +121,24 @@ public boolean eliminarReceta(int idReceta) {
     return false;  // Fallo al eliminar
 }
 
+public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) {
+    String sql = "INSERT INTO Planificador (id_usuario, fecha, id_receta) VALUES (" +
+                 idUsuario + ", '" + fecha + "', " + idReceta + ");";
+
+    objMySqlConnection.open();  // Abrir la conexión
+
+    if (!objMySqlConnection.isError()) {
+        System.out.println(sql);  // Para depuración, muestra la consulta generada
+        objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
+        objMySqlConnection.close();  // Cerrar la conexión
+        return true;  // Éxito al asignar
+    } else {
+        System.out.println("Error al asignar receta: " + objMySqlConnection.msgError());
+    }
+
+    return false;  // Si hubo un error
+}
+
+
     
 }

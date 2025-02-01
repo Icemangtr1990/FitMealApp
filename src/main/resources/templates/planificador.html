@@ -8,16 +8,18 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <div class="container" id="planificador">
-        <h1>Planificador Semanal</h1>
-        <p>Aquí puedes planificar tus comidas:</p>
-        <ul>
-            <li>Lunes: Comida 1</li>
-            <li>Martes: Comida 2</li>
-            <li>Miércoles: Comida 3</li>
-        </ul>
-        <button class="btn-success">Editar Plan</button>
-    </div>
+    <h2><span th:text="${iDusuario}"></span></h2>
+    <h2>Tus Recetas Asignadas</h2>
+    <ul>
+        <th:block th:each="receta : ${recetasAsignadas}">
+            <li>
+                <h3 th:text="${receta.nombreReceta}"></h3>
+                <p><b>Descripción:</b> <span th:text="${receta.descripcion}"></span></p>
+                <p><b>Ingredientes:</b> <span th:text="${receta.ingredientes}"></span></p>
+                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}"></span></p>
+            </li>
+        </th:block>
+    </ul>
 </body>
 </html>
 

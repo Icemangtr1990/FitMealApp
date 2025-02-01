@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import es.dsw.models.Planificador;
 import es.dsw.models.Recetas;
 import es.dsw.models.Users;
+import jakarta.servlet.http.HttpSession;
 
 
 @Controller
@@ -67,77 +69,54 @@ public class MainController {
         return "index";
     }
 
-     @GetMapping("/recetas")
-    public String mostrarRecetas(Model model) {
+    //  @GetMapping("/recetas")
+    // public String mostrarRecetas(Model model) {
 
-        String usuario = (String) model.getAttribute("usuario");
+    //     String usuario = (String) model.getAttribute("usuario");
 
         
-        String rol = (String) model.getAttribute("rol");
-        int idUsuario = (int) model.getAttribute("idUsuario");
+    //     String rol = (String) model.getAttribute("rol");
+    //     int idUsuario = (int) model.getAttribute("idUsuario");
        
-        Recetas receta = new Recetas();
-        List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
+    //     Recetas receta = new Recetas();
+    //     Users user = new Users();
+
+    //     List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
+    //     ArrayList<Users> listaUsuarios = user.getUser(); // Obtener usuarios
+    //     model.addAttribute("usuarios", listaUsuarios); // Pasar usuarios al modelo
+    //     model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
         
-        model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
-        
-        return "recetas"; // Renderizar la plantilla recetas.html
+    //     return "recetas"; // Renderizar la plantilla recetas.html
 
 
-     }
+    //  }
 
-//    @GetMapping("/agregarReceta")
-//     public String agregarReceta(@RequestParam("nombre") String nombreReceta,
-//                              @RequestParam("descripcion") String descripcion,
-//                              @RequestParam("ingredientes") String ingredientes,
-//                              @RequestParam("instrucciones") String instrucciones,
-//                              @RequestParam(value = "imagen", required = false) String imagen) {
-    
-//     // Crear una nueva instancia de Recetas y setear los valores
-    
-//     // Convertir la lista de ingredientes en formato JSON
-//     // Separar los ingredientes por coma
-//     String[] ingredientesArray = ingredientes.split(","); // Esto convierte la cadena en un array de ingredientes
+    @GetMapping("/recetas")
+public String mostrarRecetas(Model model) {
+    // Verificar si los atributos existen antes de hacer casting
+    String usuario = (String) model.getAttribute("usuario");
+    String rol = (String) model.getAttribute("rol");
 
-//     // Crear un JSON con los ingredientes
-//     StringBuilder ingredientesJson = new StringBuilder("{");
+    // Manejar el caso en que idUsuario sea null
+    Integer idUsuarioObj = (Integer) model.getAttribute("idUsuario");
+    int idUsuario = (idUsuarioObj != null) ? idUsuarioObj : -1;  // Si es null, asignar un valor por defecto (-1)
 
-//     for (int i = 0; i < ingredientesArray.length; i++) {
-//         // Limpiar los espacios extra de cada ingrediente
-//         String ingrediente = ingredientesArray[i].trim();
-//         ingredientesJson.append("\"ingrediente" + (i + 1) + "\": \"" + ingrediente + "\"");
-        
-//         // Si no es el último ingrediente, añadir coma
-//         if (i < ingredientesArray.length - 1) {
-//             ingredientesJson.append(", ");
-//         }
-//     }
+    Recetas receta = new Recetas();
+    Users user = new Users();
 
-//     // Cerrar el JSON
-//     ingredientesJson.append("}");
+    List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
+    ArrayList<Users> listaUsuarios = user.getUser(); // Obtener usuarios
 
-//     // Asignar los valores a la receta
-//     Recetas nuevaReceta = new Recetas();
-//     nuevaReceta.setNombreReceta(nombreReceta);
-//     nuevaReceta.setDescripcion(descripcion);
-//     nuevaReceta.setInstrucciones(instrucciones);
-//     nuevaReceta.setIngredientes(ingredientesJson.toString());  // Setear los ingredientes en formato JSON
-//     nuevaReceta.setImagen(imagen != null && !imagen.trim().isEmpty() ? imagen : null);  // Si la imagen está vacía, asignar null
-//     nuevaReceta.setIdUsuario(1);  // Aquí puedes poner el ID del usuario autenticado si lo tienes
+    model.addAttribute("usuario", usuario);
+    model.addAttribute("rol", rol);
+    model.addAttribute("idUsuario", idUsuario);
+    model.addAttribute("usuarios", listaUsuarios); // Pasar usuarios al modelo
+    model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
 
-//     // Intentar insertar la receta en la base de datos
-//     boolean success = nuevaReceta.insertReceta();
+    return "recetas"; // Renderizar la plantilla recetas.html
+}
 
-//     if (success) {
-//         // Si la inserción fue exitosa
-//         System.out.println("Receta insertada con éxito ");
-//         return "redirect:/recetas";  // Redirigir a una página de éxito 
-//     } else {
-//         // Si hubo algún error
-//         System.out.println("Error al insertar la receta.");
-//         return "error";  // Redirigir a una página de error (error.html)
-//     }
-// }
+
 
 @GetMapping("/agregarReceta")
 public String agregarReceta(@RequestParam("nombre") String nombreReceta,
@@ -201,12 +180,57 @@ public String eliminarReceta(@RequestParam("idReceta") int idReceta) {
     return "redirect:/recetas"; // Redirigimos a la lista de recetas
 }
 
+@PostMapping("/asignarReceta")
+public String asignarReceta(@RequestParam("idReceta") int idReceta,
+                             @RequestParam("idUsuario") int idUsuario,
+                             @RequestParam("fecha") String fecha,
+                             Model model) {
+    
+    Recetas receta = new Recetas();
+    Users user = new Users();
+    ArrayList<Users> listaUsuarios = user.getUser();  // Obtiene la lista de usuarios
+
+    model.addAttribute("usuarios", listaUsuarios);  // Pasamos los usuarios al modelo
+    
+    List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
+        
+        model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
+
+    boolean success = receta.asignarRecetaAUsuario(idReceta, idUsuario, fecha);
+    System.out.println("Asignar receta: " + success);
+    if (success) {
+        System.out.println("OK");
+        return "redirect:/recetas";  // Redirigir a la página de recetas
+        
+    } else {
+        System.out.println("ERROR");
+        System.out.println(success);
+        return "error";  // Redirigir a una página de error si no se pudo asignar
+    }
+
+
+}
+
+
     
 
     @GetMapping("/planificador")
-    public String mostrarPlanificador() {
-        return "planificador"; // Este archivo deberá estar en /resources/templates
+public String mostrarPlanificador(Model model, HttpSession session) {
+    Integer idUsuario = (Integer) session.getAttribute("idUsuario"); // Obtener ID del usuario logueado
+
+    if (idUsuario == null) {
+        return "redirect:/login"; // Redirigir si no está logueado
     }
+
+    Planificador planificador = new Planificador();
+    List<Recetas> recetasAsignadas = planificador.obtenerRecetasPorUsuario(idUsuario);
+
+    model.addAttribute("recetasAsignadas", recetasAsignadas);
+    model.addAttribute("iDusuario", idUsuario);
+
+    return "planificador"; // Renderizar la vista planificador.html
+}
+
 
     @GetMapping("/compras")
     public String mostrarListaCompras() {
