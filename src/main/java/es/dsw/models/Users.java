@@ -73,27 +73,7 @@ public class Users {
         return objListaUsuarios;
     }
 
-    // public int obtenerIdUsuarioPorUsername(String username) {
-    //     int idUsuario = -1; // Valor por defecto si no se encuentra el usuario
-    //     String sql = "SELECT id_usuario FROM usuarios WHERE nombre = ?";
-        
-    //     objMySqlConnection.open(); // Abre la conexión a la base de datos
-    //     if (!objMySqlConnection.isError()) {
-    //         try {
-    //             ResultSet rs = objMySqlConnection.executeSelect(sql);
-    //             if (rs != null && rs.next()) {
-    //                 idUsuario = rs.getInt("id_usuario");
-    //             }
-    //         } catch (SQLException e) {
-    //             e.printStackTrace();
-    //         } finally {
-    //             objMySqlConnection.close();
-    //         }
-    //     } else {
-    //         System.out.println("Error en la conexión: " + objMySqlConnection.msgError());
-    //     }
-    //     return idUsuario; // Retorna el ID del usuario
-    // }
+    
 
     public Users getUserByUsername(String username) {
     // Usamos una consulta parametrizada para obtener un solo usuario por su nombre de usuario
@@ -131,6 +111,29 @@ public class Users {
     
     return objUsuario;
 }
+
+
+public boolean insertUser() {
+    String sql = "INSERT INTO usuarios (nombre, password, email, rol) " +
+                 "VALUES ('" + this.nombre + "', " +
+                 "'" + this.passwd + "', " +
+                 "'" + this.email + "', " +
+                 "'" + this.userRole + "');";
+
+    objMySqlConnection.open();  // Abrir la conexión a la base de datos
+    
+    if (!objMySqlConnection.isError()) {
+        System.out.println(sql);  // Para depuración, muestra la consulta generada
+        objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
+        objMySqlConnection.close();  // Cerrar la conexión
+        return true;  // Si la inserción fue exitosa
+    } else {
+        System.out.println("Error en conexión: " + objMySqlConnection.msgError());
+    }
+
+    return false;  // Si hubo error en la inserción
+}
+
     
 
 

@@ -37,14 +37,14 @@ public class SecurityConfiguration {
 				                 )
 		   .httpBasic(withDefaults())
 		   .formLogin(form -> form
-				              .loginPage("/loggin")
+				              .loginPage("/index")
 				              .loginProcessingUrl("/logginprocess")
 							  .defaultSuccessUrl("/index", true)
 							  
 				              .permitAll()
 				   )
 		   
-		.logout((logout) -> logout.logoutSuccessUrl("/loggin").permitAll());
+		.logout((logout) -> logout.logoutSuccessUrl("/index").permitAll());
 		
 		return http.build();
 	}
@@ -58,7 +58,7 @@ public class SecurityConfiguration {
 		
 
 		ArrayList<Users> objListaUsuarios  = new Users().getUser();	
-		System.out.println(objListaUsuarios);
+		//System.out.println(objListaUsuarios);
 	 	for(Users usuario : objListaUsuarios) {
 		 	@SuppressWarnings("deprecation")
 		 	UserDetails user = User.withDefaultPasswordEncoder()
@@ -67,8 +67,8 @@ public class SecurityConfiguration {
 		 					   .roles(usuario.getUserRole())
 		 		               .build();
 		 InMeory.createUser(user);
-			System.out.println(usuario.getNombre());
-			System.out.println(usuario.getUserRole());
+			//System.out.println(usuario.getNombre());
+			//System.out.println(usuario.getUserRole());
 
 		}
 		return InMeory;

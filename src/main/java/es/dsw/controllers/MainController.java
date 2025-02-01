@@ -10,8 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import es.dsw.models.Recetas;
 import es.dsw.models.Users;
@@ -145,4 +147,36 @@ public class MainController {
     public String mostrarListaCompras() {
         return "compras"; // Este archivo deberá estar en /resources/templates
     }
+
+    @GetMapping("/crearUsuario")
+    public String mostrarFormularioCrearUsuario() {
+        return "crearUsuario";  // Nombre del HTML
+    }
+
+  
+    @PostMapping("/admin/crear-usuario")
+public String crearUsuario(@RequestParam String nombre, 
+                           @RequestParam String passwd, 
+                           @RequestParam String email, 
+                           @RequestParam String userRole, 
+                           RedirectAttributes redirectAttributes) {
+
+    Users nuevoUsuario = new Users();
+    nuevoUsuario.setNombre(nombre);
+    nuevoUsuario.setPasswd(passwd);  // Sin cifrar
+    nuevoUsuario.setEmail(email);
+    nuevoUsuario.setUserRole(userRole);
+
+    if (nuevoUsuario.insertUser()) {
+        redirectAttributes.addFlashAttribute("mensaje", "Usuario creado correctamente");
+    } else {
+        redirectAttributes.addFlashAttribute("error", "Error al crear el usuario");
+    }
+
+    return "redirect:/crearUsuario"; // Redirigir de vuelta al formulario
 }
+
+    
+
+}
+

@@ -169,7 +169,7 @@ public class MySqlConnection {
 				if (!this.connection.isClosed()) {
 					java.sql.Statement objStament = this.connection.createStatement();	
 					ResultSet rs = objStament.executeQuery (_sql);
-					System.out.println("Select");
+					//System.out.println("Select");
 					return rs;
 				}
 				else {
