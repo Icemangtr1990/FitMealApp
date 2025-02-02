@@ -8,7 +8,10 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Bienvenido al Planificador de Comidas</h1>
-        <p class="text-center">Encuentra recetas, organiza tu semana y haz la compra fácilmente. Inicia sesión para descubrir un mundo de ventajas:</p>
+        <p class="text-center">Encuentra recetas, organiza tu semana y haz la compra fácilmente.</p>
+        <div sec:authorize="isAnonymous()">
+        Inicia sesión para descubrir un mundo de ventajas:
+        </div>
         <div class="text-center mt-4">
                     
             

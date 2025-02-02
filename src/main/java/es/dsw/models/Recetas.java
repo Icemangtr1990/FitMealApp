@@ -1,11 +1,15 @@
 package es.dsw.models;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.dsw.connections.MySqlConnection;
 
@@ -21,6 +25,8 @@ public class Recetas {
     private int idUsuario;  // Relación con la tabla usuarios
     private Date fecha;
     
+
+    
     private final MySqlConnection objMySqlConnection;
     
     public Recetas() {
@@ -28,6 +34,9 @@ public class Recetas {
     }
 
     // Métodos Getter y Setter
+
+    
+    
     public int getIdReceta() { return idReceta; }
     public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
 
@@ -63,24 +72,52 @@ public class Recetas {
     }
 
    
-    public boolean insertReceta() {
-        String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +
-                     "VALUES ('" + this.nombreReceta + "', " +
-                     "'" + this.descripcion + "', " +
-                     "'" + this.instrucciones + "', " +
-                     "'" + this.ingredientes + "', " + 
-                     "'" + this.imagen + "', " +
-                     this.idUsuario + ");";
+    // public boolean insertReceta() {
+    //     String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +
+    //                  "VALUES ('" + this.nombreReceta + "', " +
+    //                  "'" + this.descripcion + "', " +
+    //                  "'" + this.instrucciones + "', " +
+    //                  "'" + this.ingredientes + "', " + 
+    //                  "'" + this.imagen + "', " +
+    //                  this.idUsuario + ");";
         
-        objMySqlConnection.open();  // Abrir la conexión a la base de datos
-        if (!objMySqlConnection.isError()) {
-            System.out.println(sql);
-            objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
+    //     objMySqlConnection.open();  // Abrir la conexión a la base de datos
+    //     if (!objMySqlConnection.isError()) {
+    //         System.out.println(sql);
+    //         objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
+    //         return true;  // Si la inserción fue exitosa
+    //     }
+    //     objMySqlConnection.close();  // Cerrar la conexión
+    //     return false;  // Retornar falso si hubo algún error
+    // }
+
+    public boolean insertReceta() {
+    String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +
+                 "VALUES (?, ?, ?, ?, ?, ?)";
+    
+    objMySqlConnection.open();  // Abrir la conexión a la base de datos
+    
+    if (!objMySqlConnection.isError()) {
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            // Establecer los parámetros de forma segura con PreparedStatement
+            stmt.setString(1, this.nombreReceta);
+            stmt.setString(2, this.descripcion);
+            stmt.setString(3, this.instrucciones);
+            stmt.setString(4, this.ingredientes);  // Aquí insertamos el JSON
+            stmt.setString(5, this.imagen);
+            stmt.setInt(6, this.idUsuario);
+            
+            stmt.executeUpdate();  // Ejecutar la inserción
             return true;  // Si la inserción fue exitosa
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        objMySqlConnection.close();  // Cerrar la conexión
-        return false;  // Retornar falso si hubo algún error
     }
+    
+    objMySqlConnection.close();  // Cerrar la conexión
+    return false;  // Retornar falso si hubo algún error
+}
+
 
     public List<Recetas> obtenerTodasLasRecetas() {
     List<Recetas> listaRecetas = new ArrayList<>();
@@ -102,6 +139,8 @@ public class Recetas {
                 receta.setIngredientes(rs.getString("ingredientes"));
                 receta.setImagen(rs.getString("imagen"));
                 receta.setIdUsuario(rs.getInt("id_usuario"));
+                String ingredientesFormateados = receta.getIngredientesFormateados();
+                    receta.setIngredientes(ingredientesFormateados);
 
                 // Añadimos la receta a la lista
                 listaRecetas.add(receta);
@@ -185,6 +224,34 @@ public ArrayList<Recetas> obtenerListaDeCompras(int idUsuario) {
 
     return listaCompras;
 }
+
+ public String getIngredientesFormateados() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // Parsear la cadena JSON a una lista de mapas
+            List<Map<String, String>> ingredientesList = objectMapper.readValue(ingredientes, List.class);
+            StringBuilder ingredientesFormateados = new StringBuilder();
+            
+            // Formatear la lista de ingredientes en un formato más natural
+            for (Map<String, String> ingrediente : ingredientesList) {
+                String cantidad = ingrediente.get("cantidad");
+                String ingredienteNombre = ingrediente.get("ingrediente");
+                ingredientesFormateados.append(cantidad).append(" de ").append(ingredienteNombre).append(", ");
+            }
+            
+            // Eliminar la última coma y espacio
+            if (ingredientesFormateados.length() > 0) {
+                ingredientesFormateados.setLength(ingredientesFormateados.length() - 2);
+            }
+
+            return ingredientesFormateados.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    
 
 
 

@@ -209,10 +209,7 @@ public String asignarReceta(@RequestParam("idReceta") int idReceta,
     }
 
 
-}
-
-
-    
+}    
 
     @GetMapping("/planificador")
 public String mostrarPlanificador(Model model, HttpSession session) {
