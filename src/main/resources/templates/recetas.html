@@ -64,6 +64,15 @@
         }
     </script>
     
+    <h2>Recetas Asignadas</h2>
+<div th:each="planificador : ${recetasAsignadas}">
+    <p><b>Receta: <span th:text="${planificador.receta.nombreReceta}"></span></b></p>
+    <p>Usuarios: <span th:text="${planificador.usuarios}"></span></p>  <!--Mostrar los usuarios concatenados -->
+        
+</div>
+
+
+
 
 
       

@@ -91,7 +91,68 @@ public class MainController {
 
     //  }
 
-    @GetMapping("/recetas")
+//     @GetMapping("/recetas")
+// public String mostrarRecetas(Model model) {
+//     // Verificar si los atributos existen antes de hacer casting
+//     String usuario = (String) model.getAttribute("usuario");
+//     String rol = (String) model.getAttribute("rol");
+
+//     // Manejar el caso en que idUsuario sea null
+//     Integer idUsuarioObj = (Integer) model.getAttribute("idUsuario");
+//     int idUsuario = (idUsuarioObj != null) ? idUsuarioObj : -1;  // Si es null, asignar un valor por defecto (-1)
+
+//     Recetas receta = new Recetas();
+//     Users user = new Users();
+
+//     List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
+//     ArrayList<Users> listaUsuarios = user.getUser(); // Obtener usuarios
+
+//     model.addAttribute("usuario", usuario);
+//     model.addAttribute("rol", rol);
+//     model.addAttribute("idUsuario", idUsuario);
+//     model.addAttribute("usuarios", listaUsuarios); // Pasar usuarios al modelo
+//     model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
+
+//     return "recetas"; // Renderizar la plantilla recetas.html
+// }
+
+// @GetMapping("/recetas")
+// public String mostrarRecetas(Model model) {
+//     // Verificar si los atributos existen antes de hacer casting
+//     String usuario = (String) model.getAttribute("usuario");
+//     String rol = (String) model.getAttribute("rol");
+
+//     // Manejar el caso en que idUsuario sea null
+//     Integer idUsuarioObj = (Integer) model.getAttribute("idUsuario");
+//     int idUsuario = (idUsuarioObj != null) ? idUsuarioObj : -1;  // Si es null, asignar un valor por defecto (-1)
+
+//     Recetas receta = new Recetas();
+//     Users user = new Users();
+//     Planificador planificador = new Planificador();  // Crear una instancia de Planificador
+
+//     // Obtener todas las recetas
+//     List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas();
+
+//     // Obtener todos los usuarios
+//     ArrayList<Users> listaUsuarios = user.getUser();
+
+//     // Obtener las recetas asignadas a cada usuario desde la tabla Planificador
+//     // Usamos la función de Planificador para obtener las recetas asignadas
+    
+//     List<Planificador> recetasAsignadas = planificador.obtenerRecetasPorUsuarios();
+
+//     // Agregar los datos al modelo
+//     model.addAttribute("usuario", usuario);
+//     model.addAttribute("rol", rol);
+//     model.addAttribute("idUsuario", idUsuario);
+//     model.addAttribute("usuarios", listaUsuarios); // Pasar usuarios al modelo
+//     model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
+//     model.addAttribute("recetasAsignadas", recetasAsignadas); // Pasar las recetas asignadas al modelo
+
+//     return "recetas"; // Renderizar la plantilla recetas.html
+// }
+
+@GetMapping("/recetas")
 public String mostrarRecetas(Model model) {
     // Verificar si los atributos existen antes de hacer casting
     String usuario = (String) model.getAttribute("usuario");
@@ -101,20 +162,48 @@ public String mostrarRecetas(Model model) {
     Integer idUsuarioObj = (Integer) model.getAttribute("idUsuario");
     int idUsuario = (idUsuarioObj != null) ? idUsuarioObj : -1;  // Si es null, asignar un valor por defecto (-1)
 
+    // Crear instancias de las clases necesarias
     Recetas receta = new Recetas();
     Users user = new Users();
+    Planificador planificador = new Planificador();  // Crear una instancia de Planificador
 
-    List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas(); // Obtener todas las recetas
-    ArrayList<Users> listaUsuarios = user.getUser(); // Obtener usuarios
+    // Obtener todas las recetas
+    List<Recetas> listaRecetas = receta.obtenerTodasLasRecetas();
 
+    // Verificar si listaRecetas está vacía
+    if (listaRecetas.isEmpty()) {
+        System.out.println("No se encontraron recetas.");
+    }
+
+    // Obtener todos los usuarios
+    ArrayList<Users> listaUsuarios = user.getUser();
+
+    // Verificar si listaUsuarios está vacía
+    if (listaUsuarios.isEmpty()) {
+        System.out.println("No se encontraron usuarios.");
+    }
+
+    // Obtener las recetas asignadas a cada usuario desde la tabla Planificador
+    List<Planificador> recetasAsignadas = planificador.obtenerRecetasPorUsuarios();
+
+    // Verificar si recetasAsignadas está vacía
+    if (recetasAsignadas.isEmpty()) {
+        System.out.println("No se encontraron recetas asignadas.");
+    }
+
+    // Agregar los datos al modelo
     model.addAttribute("usuario", usuario);
     model.addAttribute("rol", rol);
     model.addAttribute("idUsuario", idUsuario);
     model.addAttribute("usuarios", listaUsuarios); // Pasar usuarios al modelo
     model.addAttribute("listaRecetas", listaRecetas); // Pasar las recetas al modelo
+    model.addAttribute("recetasAsignadas", recetasAsignadas); // Pasar las recetas asignadas al modelo
 
     return "recetas"; // Renderizar la plantilla recetas.html
 }
+
+
+
 
 
 
