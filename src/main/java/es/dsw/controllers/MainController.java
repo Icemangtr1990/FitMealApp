@@ -232,10 +232,17 @@ public String mostrarPlanificador(Model model, HttpSession session) {
 }
 
 
-    @GetMapping("/compras")
-    public String mostrarListaCompras() {
-        return "compras"; // Este archivo deberá estar en /resources/templates
-    }
+@GetMapping("/compras")
+public String mostrarListaCompras(Model model,HttpSession session) {
+    Integer idUsuario = (Integer) session.getAttribute("idUsuario"); // Obtener ID del usuario logueado
+    
+    Recetas receta = new Recetas();
+    
+    List<Recetas> listaCompras = receta.obtenerListaDeCompras(idUsuario);  
+    model.addAttribute("listaCompras", listaCompras);  
+
+    return "compras";  
+}
 
     @GetMapping("/crearUsuario")
     public String mostrarFormularioCrearUsuario() {

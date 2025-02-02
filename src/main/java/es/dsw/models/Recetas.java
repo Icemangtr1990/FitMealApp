@@ -2,7 +2,9 @@ package es.dsw.models;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import es.dsw.connections.MySqlConnection;
@@ -17,6 +19,7 @@ public class Recetas {
     private String ingredientes;  // Utilizando JSON como String
     private String imagen;
     private int idUsuario;  // Relación con la tabla usuarios
+    private Date fecha;
     
     private final MySqlConnection objMySqlConnection;
     
@@ -45,6 +48,19 @@ public class Recetas {
 
     public int getIdUsuario() { return idUsuario; }
     public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getFechaFormateada() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(fecha);
+    }
 
    
     public boolean insertReceta() {
@@ -138,6 +154,38 @@ public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) 
 
     return false;  // Si hubo un error
 }
+
+public ArrayList<Recetas> obtenerListaDeCompras(int idUsuario) {
+    String sql = "SELECT r.nombre_receta, r.ingredientes " +
+                 "FROM Recetas r " +
+                 "JOIN Planificador p ON r.id_receta = p.id_receta " +
+                 "WHERE p.id_usuario = " + idUsuario;
+
+    ArrayList<Recetas> listaCompras = new ArrayList<>();
+    objMySqlConnection.open();
+
+    if (!objMySqlConnection.isError()) {
+        ResultSet rs = objMySqlConnection.executeSelect(sql);
+
+        try {
+            while (rs.next()) {
+                Recetas receta = new Recetas();
+                receta.setNombreReceta(rs.getString("nombre_receta"));
+                receta.setIngredientes(rs.getString("ingredientes"));
+                listaCompras.add(receta);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
+    } else {
+        System.out.println("Error al ejecutar la consulta: " + objMySqlConnection.msgError());
+    }
+
+    return listaCompras;
+}
+
 
 
     

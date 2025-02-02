@@ -16,7 +16,11 @@
                 <h3 th:text="${receta.nombreReceta}"></h3>
                 <p><b>Descripción:</b> <span th:text="${receta.descripcion}"></span></p>
                 <p><b>Ingredientes:</b> <span th:text="${receta.ingredientes}"></span></p>
-                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}"></span></p>
+                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}" class="text-wrap"></span></p>
+                <p><b>Descripción:</b> <span th:text="${receta.descripcion}" class="text-wrap"></span></p>
+                <p><b>Fecha:</b> <span th:text="${receta.fechaFormateada}"></span></p>
+
+
             </li>
         </th:block>
     </ul>
