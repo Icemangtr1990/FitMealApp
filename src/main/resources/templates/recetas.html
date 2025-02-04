@@ -64,12 +64,40 @@
         }
     </script>
     
-    <h2>Recetas Asignadas</h2>
+    <!-- <h2>Recetas Asignadas</h2>
 <div th:each="planificador : ${recetasAsignadas}">
     <p><b>Receta: <span th:text="${planificador.receta.nombreReceta}"></span></b></p>
-    <p>Usuarios: <span th:text="${planificador.usuarios}"></span></p>  <!--Mostrar los usuarios concatenados -->
-        
+    <p>Usuarios: <span th:text="${planificador.usuarios}"></span></p>  Mostrar los usuarios concatenados 
+    <tr>
+        <td>${receta.nombreReceta}</td>
+        <td>
+            <c:forEach var="usuario" items="${receta.usuarios}">
+                ${usuario}
+                <button type="button" onclick="eliminarUsuarioDeReceta(${usuario.id}, ${receta.id})">Eliminar</button>
+            </c:forEach>
+        </td>
+    </tr>
+</div> -->
+
+<h2>Recetas Asignadas</h2>
+<div th:each="planificador : ${recetasAsignadas}">
+    <p><h2><strong>Receta:</strong> <span th:text="${planificador.receta.nombreReceta}"></span></h2></p>
+    <p><strong>Usuarios Asignados:</strong></p>
+    <ul>
+        <th:block th:each="usuario : ${planificador.listaUsuarios}">
+            <li>
+                <span th:text="${usuario.nombre}"></span>
+                <form th:action="@{/eliminarAsignacion}" method="post" style="display:inline;">
+                    <input type="hidden" name="idUsuario" th:value="${usuario.idUser}" />
+                    <input type="hidden" name="idReceta" th:value="${planificador.receta.idReceta}" />
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </li>
+        </th:block>
+    </ul>
 </div>
+
+
 
 
 

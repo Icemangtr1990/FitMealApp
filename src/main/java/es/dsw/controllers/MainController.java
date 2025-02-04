@@ -297,8 +297,25 @@ public String asignarReceta(@RequestParam("idReceta") int idReceta,
         return "error";  // Redirigir a una página de error si no se pudo asignar
     }
 
-
 }    
+
+@PostMapping("/eliminarAsignacion")
+public String eliminarAsignacion(@RequestParam("idUsuario") int idUsuario, 
+                                 @RequestParam("idReceta") int idReceta, 
+                                 RedirectAttributes redirectAttributes) {
+    Planificador planificador = new Planificador();
+    
+    if (planificador.eliminarAsignacion(idUsuario, idReceta)) {
+        redirectAttributes.addFlashAttribute("mensaje", "Asignación eliminada con éxito.");
+    } else {
+        redirectAttributes.addFlashAttribute("error", "No se pudo eliminar la asignación.");
+    }
+    
+    return "redirect:/recetas"; // Redirigir a la vista de recetas
+}
+
+
+
 
     @GetMapping("/planificador")
 public String mostrarPlanificador(Model model, HttpSession session) {

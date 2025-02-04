@@ -259,13 +259,96 @@ public class Planificador {
 //     return recetasAsignadas; // Retornar todas las recetas asignadas
 // }
 
+// public List<Planificador> obtenerRecetasPorUsuarios() {
+//     List<Planificador> recetasAsignadas = new ArrayList<>();
+//     objMySqlConnection.open();
+
+//     // Consulta para obtener todas las recetas con sus usuarios asignados
+//     String sql = "SELECT r.id_receta, r.nombre_receta, r.descripcion, r.ingredientes, r.instrucciones, r.imagen, " +
+//                  "GROUP_CONCAT(u.nombre SEPARATOR ', ') AS usuarios " +
+//                  "FROM Planificador p " +
+//                  "JOIN Recetas r ON p.id_receta = r.id_receta " +
+//                  "JOIN Usuarios u ON p.id_usuario = u.id_usuario " +
+//                  "GROUP BY r.id_receta;";
+
+//     try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+//         ResultSet rs = stmt.executeQuery();
+
+//         while (rs.next()) {
+//             // Crear un objeto Planificador para almacenar la receta asignada
+//             Planificador planificador = new Planificador();
+//             Recetas receta = new Recetas();
+//             receta.setIdReceta(rs.getInt("id_receta"));
+//             receta.setNombreReceta(rs.getString("nombre_receta"));
+//             receta.setDescripcion(rs.getString("descripcion"));
+//             receta.setIngredientes(rs.getString("ingredientes"));
+//             receta.setInstrucciones(rs.getString("instrucciones"));
+//             receta.setImagen(rs.getString("imagen"));
+//             planificador.setReceta(receta); // Asignar la receta al Planificador
+
+//             // Obtener los usuarios asignados a la receta
+//             String usuarios = rs.getString("usuarios");
+//             System.out.println(usuarios);
+//             planificador.setUsuarios(usuarios); // Asignar los usuarios al Planificador
+
+//             // Agregar el Planificador a la lista
+//             recetasAsignadas.add(planificador);
+//         }
+//     } catch (SQLException e) {
+//         e.printStackTrace();
+//     }
+
+//     return recetasAsignadas; // Retornar todas las recetas asignadas
+// }
+
+// public List<Planificador> obtenerRecetasPorUsuarios() {
+//     List<Planificador> recetasAsignadas = new ArrayList<>();
+//     objMySqlConnection.open();
+
+//     // Consulta para obtener todas las recetas con sus usuarios asignados
+//     String sql = "SELECT r.id_receta, r.nombre_receta, r.descripcion, r.ingredientes, r.instrucciones, r.imagen, " +
+//                  "GROUP_CONCAT(u.nombre SEPARATOR ', ') AS usuarios " +
+//                  "FROM Planificador p " +
+//                  "JOIN Recetas r ON p.id_receta = r.id_receta " +
+//                  "JOIN Usuarios u ON p.id_usuario = u.id_usuario " +
+//                  "GROUP BY r.id_receta;";
+
+//     try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+//         ResultSet rs = stmt.executeQuery();
+
+//         while (rs.next()) {
+//             // Crear un objeto Planificador para almacenar la receta asignada
+//             Planificador planificador = new Planificador();
+//             Recetas receta = new Recetas();
+//             receta.setIdReceta(rs.getInt("id_receta"));
+//             receta.setNombreReceta(rs.getString("nombre_receta"));
+//             receta.setDescripcion(rs.getString("descripcion"));
+//             receta.setIngredientes(rs.getString("ingredientes"));
+//             receta.setInstrucciones(rs.getString("instrucciones"));
+//             receta.setImagen(rs.getString("imagen"));
+//             planificador.setReceta(receta); // Asignar la receta al Planificador
+
+//             // Obtener los usuarios asignados a la receta
+//             String usuarios = rs.getString("usuarios");
+//             System.out.println(usuarios);
+//             planificador.setUsuarios(usuarios); // Asignar los usuarios al Planificador
+
+//             // Agregar el Planificador a la lista
+//             recetasAsignadas.add(planificador);
+//         }
+//     } catch (SQLException e) {
+//         e.printStackTrace();
+//     }
+
+//     return recetasAsignadas; // Retornar todas las recetas asignadas
+// }
+
 public List<Planificador> obtenerRecetasPorUsuarios() {
     List<Planificador> recetasAsignadas = new ArrayList<>();
     objMySqlConnection.open();
 
-    // Consulta para obtener todas las recetas con sus usuarios asignados
     String sql = "SELECT r.id_receta, r.nombre_receta, r.descripcion, r.ingredientes, r.instrucciones, r.imagen, " +
-                 "GROUP_CONCAT(u.nombre SEPARATOR ', ') AS usuarios " +
+                 "GROUP_CONCAT(CONCAT(u.id_usuario, ':', u.nombre) SEPARATOR ', ') AS usuarios " +
                  "FROM Planificador p " +
                  "JOIN Recetas r ON p.id_receta = r.id_receta " +
                  "JOIN Usuarios u ON p.id_usuario = u.id_usuario " +
@@ -275,7 +358,6 @@ public List<Planificador> obtenerRecetasPorUsuarios() {
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
-            // Crear un objeto Planificador para almacenar la receta asignada
             Planificador planificador = new Planificador();
             Recetas receta = new Recetas();
             receta.setIdReceta(rs.getInt("id_receta"));
@@ -284,25 +366,67 @@ public List<Planificador> obtenerRecetasPorUsuarios() {
             receta.setIngredientes(rs.getString("ingredientes"));
             receta.setInstrucciones(rs.getString("instrucciones"));
             receta.setImagen(rs.getString("imagen"));
-            planificador.setReceta(receta); // Asignar la receta al Planificador
+            planificador.setReceta(receta);
 
-            // Obtener los usuarios asignados a la receta
-            String usuarios = rs.getString("usuarios");
-            System.out.println(usuarios);
-            planificador.setUsuarios(usuarios); // Asignar los usuarios al Planificador
+            // Guardar los usuarios asignados a la receta
+            String usuariosConcat = rs.getString("usuarios");
+            planificador.setUsuarios(usuariosConcat);
 
-            // Agregar el Planificador a la lista
             recetasAsignadas.add(planificador);
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
 
-    return recetasAsignadas; // Retornar todas las recetas asignadas
+    return recetasAsignadas;
+}
+
+public List<Users> getListaUsuarios() {
+    List<Users> listaUsuarios = new ArrayList<>();
+    if (usuarios != null && !usuarios.isEmpty()) {
+        String[] usuariosArray = usuarios.split(", ");
+        for (String usuarioData : usuariosArray) {
+            String[] datos = usuarioData.split(":"); // Separar id y nombre
+            if (datos.length == 2) {
+                try {
+                    Users user = new Users();
+                    user.setIdUser(Integer.parseInt(datos[0].trim())); // id_usuario
+                    user.setNombre(datos[1].trim()); // nombre
+                    listaUsuarios.add(user);
+                } catch (NumberFormatException e) {
+                    System.err.println("Error al parsear ID de usuario: " + datos[0]);
+                }
+            }
+        }
+    }
+    return listaUsuarios;
 }
 
 
 
+public boolean eliminarAsignacion(int idUsuario, int idReceta) {
+    String sql = "DELETE FROM Planificador WHERE id_usuario = ? AND id_receta = ?";
+    
+    objMySqlConnection.open(); // Abrir la conexión
+    
+    if (!objMySqlConnection.isError()) {
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            stmt.setInt(2, idReceta);
+
+            int filasAfectadas = stmt.executeUpdate(); // Ejecutar la eliminación
+            
+            objMySqlConnection.close(); // Cerrar la conexión
+            
+            return filasAfectadas > 0; // Retorna true si eliminó al menos una fila
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    objMySqlConnection.close(); // Cerrar la conexión en caso de error
+    return false;
+}
 
     
     
