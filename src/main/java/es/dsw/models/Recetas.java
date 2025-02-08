@@ -72,24 +72,7 @@ public class Recetas {
     }
 
    
-    // public boolean insertReceta() {
-    //     String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +
-    //                  "VALUES ('" + this.nombreReceta + "', " +
-    //                  "'" + this.descripcion + "', " +
-    //                  "'" + this.instrucciones + "', " +
-    //                  "'" + this.ingredientes + "', " + 
-    //                  "'" + this.imagen + "', " +
-    //                  this.idUsuario + ");";
-        
-    //     objMySqlConnection.open();  // Abrir la conexión a la base de datos
-    //     if (!objMySqlConnection.isError()) {
-    //         System.out.println(sql);
-    //         objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
-    //         return true;  // Si la inserción fue exitosa
-    //     }
-    //     objMySqlConnection.close();  // Cerrar la conexión
-    //     return false;  // Retornar falso si hubo algún error
-    // }
+    
 
     public boolean insertReceta() {
     String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +

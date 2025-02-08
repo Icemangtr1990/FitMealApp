@@ -1,29 +1,71 @@
-<!-- Página del Planificador -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificador Semanal</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Planificador Semanal - FitMealApp</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Enlace al archivo CSS -->
 </head>
 <body>
-    <h2><span th:text="${iDusuario}"></span></h2>
-    <h2>Tus Recetas Asignadas</h2>
-    <ul>
-        <th:block th:each="receta : ${recetasAsignadas}">
-            <li>
-                <h3 th:text="${receta.nombreReceta}"></h3>
-                <p><b>Descripción:</b> <span th:text="${receta.descripcion}"></span></p>
-                <p><b>Ingredientes:</b> <span th:text="${receta.ingredientes}"></span></p>
-                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}" class="text-wrap"></span></p>
-                <p><b>Descripción:</b> <span th:text="${receta.descripcion}" class="text-wrap"></span></p>
-                <p><b>Fecha:</b> <span th:text="${receta.fechaFormateada}"></span></p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">FitMealApp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div sec:authorize="isAuthenticated()">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" th:href="@{/recetas}">Recetas</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/planificador}">Planificador</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
+                    </ul>
+                </div>
+                <div class="ms-auto d-flex">
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/loggin}" class="btn btn-primary">Iniciar sesión</a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="POST" class="d-inline">
+                            <button class="btn btn-danger">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Contenido Principal -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Planificador Semanal</h1>
 
-            </li>
-        </th:block>
-    </ul>
+        <h2 class="text-center mb-4">Tus Recetas Asignadas</h2>
+
+        <div th:each="receta : ${recetasAsignadas}" class="mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title" th:text="${receta.nombreReceta}">Nombre de la receta</h3>
+                    <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}"></span></p>
+                    <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientes}"></span></p>
+                    <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}" class="text-wrap"></span></p>
+                    <p><strong>Fecha:</strong> <span th:text="${receta.fechaFormateada}"></span></p>
+                </div>
+            </div>
+        </div>
+
+        <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center py-3 mt-5">
+        <div class="container">
+            <span class="text-muted">© 2025 FitMealApp. Todos los derechos reservados.</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

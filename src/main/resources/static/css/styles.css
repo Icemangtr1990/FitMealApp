@@ -1,69 +1,83 @@
-/* General */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
+/* Estilo global para todo el sitio */
+
+/* Reset básico de márgenes y padding */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-/* Encabezado principal */
-h1 {
-    color: #343a40;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+/* Fuente global */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7fb; /* Fondo suave gris claro */
+    color: #333; /* Color de texto oscuro para mejor legibilidad */
 }
 
-/* Textos */
-p {
-    color: #6c757d;
-    font-size: 1.2rem;
+/* Navbar */
+.navbar {
+    background-color: #6c757d; /* Gris suave para el navbar */
 }
 
+.navbar a {
+    color: #343a40 !important; /* Gris oscuro para el texto del navbar */
+}
+
+.navbar a:hover {
+    color: #fff !important; /* Blanco al pasar el ratón sobre el enlace */
+    background-color: #007bff; /* Fondo azul al pasar el ratón */
+}
+
+/* Botón Iniciar sesión */
+.navbar .btn-primary {
+    color: #fff; /* Color blanco para el texto */
+    background-color: #007bff; /* Fondo azul para el botón */
+    border: none;
+}
+
+.navbar .btn-primary:hover {
+    background-color: #0056b3; /* Fondo azul más oscuro al pasar el ratón */
+    color: #fff; /* Asegura que el texto siga siendo blanco */
+}
+
+/* Carrusel */
+.carousel-inner img {
+    width: 600px;
+    height: 600px; /* Ajusta la altura según lo necesites */
+    object-fit: cover;
+    
+}
+#carouselExample {
+    max-width: 90%; /* Ajusta el porcentaje según lo necesites */
+    margin: 0 auto; /* Centra el carrusel */
+    border-radius: 5px;
+}
 /* Botones */
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.btn {
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+.btn:hover {
+    background-color: #00060c; /* Azul claro al pasar el ratón */
 }
 
-.btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+/* Footer */
+footer {
+    background-color: #e9ecef; /* Fondo gris suave para el footer */
+    color: #777;
+    padding: 10px;
+    margin-top: 20px;
 }
 
-.btn-success:hover {
-    background-color: #1e7e34;
-    transform: scale(1.05);
+footer span {
+    font-size: 0.9em;
 }
 
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-warning:hover {
-    background-color: #e0a800;
-    transform: scale(1.05);
-}
-
-/* Centrado */
-.text-center {
-    text-align: center;
-}
-
-/* Contenedor */
+/* Contenedor principal */
 .container {
     padding: 20px;
-    margin: auto;
-    max-width: 600px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+

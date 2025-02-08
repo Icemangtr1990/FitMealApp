@@ -41,37 +41,7 @@ public class Users {
 
  
 
-    // public ArrayList<Users> getUser() {
-    //     String sql = "SELECT nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
-        
-    //     ArrayList<Users> objListaUsuarios = new ArrayList<>();
-    //     objMySqlConnection.open();
-    
-    //     if (!objMySqlConnection.isError()) {
-    //         ResultSet result = objMySqlConnection.executeSelect(sql);
-    //         if (result == null) {
-    //             System.out.println("El ResultSet es null. Error en la ejecución de la consulta.");
-    //         } else {
-    //             try {
-    //                 while (result.next()) {
-    //                     Users objUsuario = new Users();
-    //                     objUsuario.setPasswd(result.getString("CONTRASEÑA"));
-    //                     objUsuario.setNombre(result.getString("NOMBRE"));
-    //                     objUsuario.setEmail(result.getString("EMAIL"));
-    //                     objUsuario.setUserRole(result.getString("ROL"));
-    //                     objListaUsuarios.add(objUsuario);
-    //                 }
-    //             } catch (SQLException e) {
-    //                 e.printStackTrace();
-    //             } finally {
-    //                 objMySqlConnection.close();
-    //             }
-    //         }
-    //     } else {
-    //         System.out.println("Error en conexión: " + objMySqlConnection.msgError());
-    //     }
-    //     return objListaUsuarios;
-    // }
+   
 
     public ArrayList<Users> getUser() {
         String sql = "SELECT id_usuario AS ID, nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";

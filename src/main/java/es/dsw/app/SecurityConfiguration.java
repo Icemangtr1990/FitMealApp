@@ -27,6 +27,7 @@ public class SecurityConfiguration {
 		http
 		   .authorizeHttpRequests((authorize) -> authorize
 				    			  .requestMatchers("/css/**").permitAll()
+								  .requestMatchers("/images/**").permitAll()
 				    			  .requestMatchers("/index").permitAll()
 				    			  .requestMatchers("/loggin").permitAll()
 								  .requestMatchers("/recetas/**").permitAll()
@@ -40,6 +41,7 @@ public class SecurityConfiguration {
 				              .loginPage("/index")
 				              .loginProcessingUrl("/logginprocess")
 							  .defaultSuccessUrl("/index", true)
+							  .failureUrl("/loggin?error=true") // Redirige a login con error en caso de fallo
 							  
 				              .permitAll()
 				   )
@@ -67,8 +69,7 @@ public class SecurityConfiguration {
 		 					   .roles(usuario.getUserRole())
 		 		               .build();
 		 InMeory.createUser(user);
-			//System.out.println(usuario.getNombre());
-			//System.out.println(usuario.getUserRole());
+			
 
 		}
 		return InMeory;

@@ -1,192 +1,160 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Receta</title>
+    <title>Recetas - FitMealApp</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <h1>Bienvenido, <span th:text="${usuario}">Usuario</span></h1>
-    <p>Tu rol es: <span th:text="${rol}">Rol</span></p>
-    <p>Tu ID de usuario es: <span th:text="${idUsuario}">ID Usuario</span></p>
-
     
-    <!-- <form action="/agregarReceta" method="GET">
-        <input type="text" name="nombre" placeholder="Nombre de la receta" required>
-        <input type="text" name="descripcion" placeholder="Descripción" required>
-    
-       
-        <div id="ingredientes-container">
-            <div class="ingrediente">
-                <input type="text" name="cantidad[]" placeholder="Cantidad" required>
-                <input type="text" name="ingrediente[]" placeholder="Ingrediente" required>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">FitMealApp</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div sec:authorize="isAuthenticated()">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" th:href="@{/recetas}">Recetas</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/planificador}">Planificador</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
+                    </ul>
+                </div>
+                <div class="ms-auto d-flex">
+                    <div sec:authorize="isAnonymous()">
+                        <a th:href="@{/loggin}" class="btn btn-primary">Iniciar sesión</a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="POST" class="d-inline">
+                            <button class="btn btn-danger">Cerrar sesión</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-        <button type="button" onclick="agregarIngrediente()">Agregar Ingrediente</button>
-    
-        <textarea name="instrucciones" placeholder="Instrucciones" required></textarea>
-        <input type="text" name="imagen" placeholder="URL de la imagen">
-        <button type="submit">Agregar Receta</button>
-    </form> -->
+    </nav>
 
-    <div sec:authorize="hasRole('admin')">
-        <h2>Agregar Receta</h2>
-        <form action="/agregarReceta" method="GET">
-            <input type="text" name="nombre" placeholder="Nombre de la receta" required>
-            <input type="text" name="descripcion" placeholder="Descripción" required>
     
-            <!-- Campos para ingredientes dinámicos -->
-            <div id="ingredientes-container">
-                <div class="ingrediente">
-                    <input type="text" name="cantidad[]" placeholder="Cantidad" required>
-                    <input type="text" name="ingrediente[]" placeholder="Ingrediente" required>
+    <div class="container mt-5">
+        <h1 class="text-center">Bienvenido <span th:text="${usuario}">Usuario</span></h1>
+        
+        
+        <div sec:authorize="hasRole('admin')" class="mt-4">
+            <h2>Agregar Receta</h2>
+            <form action="/agregarReceta" method="GET" class="form-group">
+                <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre de la receta" required>
+                <input type="text" name="descripcion" class="form-control mb-2" placeholder="Descripción" required>
+
+               
+                <div id="ingredientes-container">
+                    <div class="ingrediente mb-2">
+                        <input type="text" name="cantidad[]" class="form-control" placeholder="Cantidad" required>
+                        <input type="text" name="ingrediente[]" class="form-control" placeholder="Ingrediente" required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary mb-2" onclick="agregarIngrediente()">Agregar Ingrediente</button>
+                
+                <textarea name="instrucciones" class="form-control mb-2" placeholder="Instrucciones" required></textarea>
+                <input type="text" name="imagen" class="form-control mb-2" placeholder="URL de la imagen">
+                <button type="submit" class="btn btn-primary">Agregar Receta</button>
+            </form>
+        </div>
+
+        <script>
+            function agregarIngrediente() {
+                const container = document.getElementById('ingredientes-container');
+                const nuevoIngrediente = document.createElement('div');
+                nuevoIngrediente.classList.add('ingrediente', 'mb-2');
+                nuevoIngrediente.innerHTML = `
+                    <input type="text" name="cantidad[]" class="form-control mb-2" placeholder="Cantidad" required>
+                    <input type="text" name="ingrediente[]" class="form-control mb-2" placeholder="Ingrediente" required>
+                `;
+                container.appendChild(nuevoIngrediente);
+            }
+        </script>
+
+       
+        <div sec:authorize="hasRole('admin')" class="mt-4">
+            <h2>Recetas Asignadas</h2>
+            <div th:each="planificador : ${recetasAsignadas}">
+                <div class="mb-4">
+                    <h3><strong>Receta:</strong> <span th:text="${planificador.receta.nombreReceta}"></span></h3>
+                    <p><strong>Usuarios Asignados:</strong></p>
+                    <ul>
+                        <th:block th:each="usuario : ${planificador.listaUsuarios}">
+                            <li>
+                                <span th:text="${usuario.nombre}"></span>
+                                <form th:action="@{/eliminarAsignacion}" method="post" style="display:inline;">
+                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUser}" />
+                                    <input type="hidden" name="idReceta" th:value="${planificador.receta.idReceta}" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </li>
+                        </th:block>
+                    </ul>
                 </div>
             </div>
-            <button type="button" onclick="agregarIngrediente()">Agregar Ingrediente</button>
-    
-            <textarea name="instrucciones" placeholder="Instrucciones" required></textarea>
-            <input type="text" name="imagen" placeholder="URL de la imagen">
-            <button type="submit">Agregar Receta</button>
-        </form>
+        </div>
+
+        
+        <div>
+            <h2>Listado de Recetas</h2>
+            <ul class="list-group">
+                <th:block th:each="receta : ${listaRecetas}">
+                    <li class="list-group-item mb-3">
+                        <h3 th:text="${receta.nombreReceta}">Nombre de la receta</h3>
+                        <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}">Descripción aquí</span></p>
+                        <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientes}">Ingredientes aquí</span></p>
+                        <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}">Instrucciones aquí</span></p>
+
+                        <div sec:authorize="hasRole('admin')">
+                            <form th:action="@{/asignarReceta}" method="post">
+                                <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
+                        
+                                <label for="idUsuario">Usuario:</label>
+                                <select name="idUsuario" required>
+                                    <th:block th:each="usuario : ${usuarios}">
+                                        <option th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
+                                    </th:block>
+                                </select>
+                        
+                                <label for="fecha">Fecha:</label>
+                                <input type="date" name="fecha" required />
+                        
+                                <button type="submit" class="btn btn-primary">Asignar Receta</button>
+                            </form>
+                        </div>
+
+                        <div sec:authorize="hasRole('admin')">
+                            <form th:action="@{/admin/eliminar-receta}" method="post">
+                                <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar Receta</button>
+                            </form>
+                        </div>
+                    </li>
+                </th:block>
+            </ul>
+        </div>
+
+        <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
     </div>
+
     
+    <footer class="bg-light text-center py-3 mt-5">
+        <div class="container">
+            <span class="text-muted">© 2025 FitMealApp. Todos los derechos reservados.</span>
+        </div>
+    </footer>
+
     
-    <script>
-        function agregarIngrediente() {
-            const container = document.getElementById('ingredientes-container');
-            const nuevoIngrediente = document.createElement('div');
-            nuevoIngrediente.classList.add('ingrediente');
-            nuevoIngrediente.innerHTML = `
-                <input type="text" name="cantidad[]" placeholder="Cantidad" required>
-                <input type="text" name="ingrediente[]" placeholder="Ingrediente" required>
-            `;
-            container.appendChild(nuevoIngrediente);
-        }
-    </script>
-    
-    <!-- <h2>Recetas Asignadas</h2>
-<div th:each="planificador : ${recetasAsignadas}">
-    <p><b>Receta: <span th:text="${planificador.receta.nombreReceta}"></span></b></p>
-    <p>Usuarios: <span th:text="${planificador.usuarios}"></span></p>  Mostrar los usuarios concatenados 
-    <tr>
-        <td>${receta.nombreReceta}</td>
-        <td>
-            <c:forEach var="usuario" items="${receta.usuarios}">
-                ${usuario}
-                <button type="button" onclick="eliminarUsuarioDeReceta(${usuario.id}, ${receta.id})">Eliminar</button>
-            </c:forEach>
-        </td>
-    </tr>
-</div> -->
-
-<h2>Recetas Asignadas</h2>
-<div th:each="planificador : ${recetasAsignadas}">
-    <p><h2><strong>Receta:</strong> <span th:text="${planificador.receta.nombreReceta}"></span></h2></p>
-    <p><strong>Usuarios Asignados:</strong></p>
-    <ul>
-        <th:block th:each="usuario : ${planificador.listaUsuarios}">
-            <li>
-                <span th:text="${usuario.nombre}"></span>
-                <form th:action="@{/eliminarAsignacion}" method="post" style="display:inline;">
-                    <input type="hidden" name="idUsuario" th:value="${usuario.idUser}" />
-                    <input type="hidden" name="idReceta" th:value="${planificador.receta.idReceta}" />
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                </form>
-            </li>
-        </th:block>
-    </ul>
-</div>
-
-
-
-
-
-
-
-      
-     <!-- <h2>Listado de Recetas</h2>
-<div>
-    <ul>
-         Iterar sobre las recetas 
-        <th:block th:each="receta : ${listaRecetas}">
-            <li>
-                <h3 th:text="${receta.nombreReceta}">Nombre de la receta</h3>
-                <p><b>Descripción:</b> <span th:text="${receta.descripcion}">Descripción aquí</span></p>
-                <p><b>Ingredientes:</b> <span th:text="${receta.ingredientes}">Ingredientes aquí</span></p>
-                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}">Instrucciones aquí</span></p>
-
-                 Botón para eliminar receta 
-                <form th:action="@{/admin/eliminar-receta}" method="post">
-                    <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                    <button type="submit">Eliminar</button>
-                </form>
-            </li>
-        </th:block>
-    </ul>
-</div> -->
-
-<h2>Listado de Recetas</h2>
-<div>
-    <ul>
-        <!-- Iterar sobre las recetas -->
-        <th:block th:each="receta : ${listaRecetas}">
-            <li>
-                <h3 th:text="${receta.nombreReceta}">Nombre de la receta</h3>
-                <p><b>Descripción:</b> <span th:text="${receta.descripcion}">Descripción aquí</span></p>
-                <p><b>Ingredientes:</b> <span th:text="${receta.ingredientes}">Ingredientes aquí</span></p>
-                <p><b>Instrucciones:</b> <span th:text="${receta.instrucciones}">Instrucciones aquí</span></p>
-
-                <!-- Formulario para asignar receta -->
-                <!-- <form th:action="@{/asignarReceta}" method="post">
-                    <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-
-                    <label for="idUsuario">Usuario:</label>
-                    <select name="idUsuario" required>
-                        <th:block th:each="usuario : ${usuarios}">
-                            <option th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
-                        </th:block>
-                    </select>
-
-                    <label for="fecha">Fecha:</label>
-                    <input type="date" name="fecha" required />
-
-                    <button type="submit">Asignar Receta</button>
-                </form> -->
-
-                <div sec:authorize="hasRole('admin')">
-                    <form th:action="@{/asignarReceta}" method="post">
-                        <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                
-                        <label for="idUsuario">Usuario:</label>
-                        <select name="idUsuario" required>
-                            <th:block th:each="usuario : ${usuarios}">
-                                <option th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
-                            </th:block>
-                        </select>
-                
-                        <label for="fecha">Fecha:</label>
-                        <input type="date" name="fecha" required />
-                
-                        <button type="submit">Asignar Receta</button>
-                    </form>
-                </div>
-
-                <!-- Botón para eliminar receta -->
-                <!-- <form th:action="@{/admin/eliminar-receta}" method="post">
-                    <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                    <button type="submit">Eliminar</button>
-                </form> -->
-                <div sec:authorize="hasRole('admin')">
-                    <form th:action="@{/admin/eliminar-receta}" method="post">
-                        <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                        <button type="submit">Eliminar</button>
-                    </form>
-                </div>
-            </li>
-        </th:block>
-    </ul>
-</div>
-
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+ 
+
+ 
