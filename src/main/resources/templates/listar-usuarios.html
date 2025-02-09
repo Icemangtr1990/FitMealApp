@@ -23,10 +23,19 @@
                         <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
                     </ul>
                 </div>
+                <div sec:authorize="hasRole('admin')">
+                    <a th:href="@{/crearUsuario}">
+                        <button class="btn btn-primary">Crear Usuario</button>
+                    </a>
+                </div>
+            
+                <div sec:authorize="hasRole('admin')">
+                    <a th:href="@{/admin/listar-usuarios}">
+                        <button class="btn btn-primary">Ver Usuarios</button>
+                    </a>
+                </div>
                 <div class="ms-auto d-flex">
-                    <div sec:authorize="isAnonymous()">
-                        <a th:href="@{/loggin}" class="btn btn-primary">Iniciar sesión</a>
-                    </div>
+                    
                     <div sec:authorize="isAuthenticated()">
                         <form th:action="@{/logout}" method="POST" class="d-inline">
                             <button class="btn btn-danger">Cerrar sesión</button>
