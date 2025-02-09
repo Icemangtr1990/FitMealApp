@@ -127,7 +127,7 @@ public boolean insertUser() {
     objMySqlConnection.open();  // Abrir la conexión a la base de datos
     
     if (!objMySqlConnection.isError()) {
-        System.out.println(sql);  // Para depuración, muestra la consulta generada
+       
         objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
         objMySqlConnection.close();  // Cerrar la conexión
         return true;  // Si la inserción fue exitosa
@@ -144,7 +144,7 @@ public boolean eliminarUsuario(int idUsuario) {
     objMySqlConnection.open();  // Abrir la conexión a la base de datos
     
     if (!objMySqlConnection.isError()) {
-        System.out.println(sql);  // Para depuración, muestra la consulta generada
+        
         objMySqlConnection.executeInsert(sql);  // Ejecutar la eliminación
         objMySqlConnection.close();  // Cerrar la conexión
         return true;  // Si la eliminación fue exitosa

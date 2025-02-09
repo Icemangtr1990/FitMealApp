@@ -14,7 +14,7 @@ public class Planificador {
     private String fecha;
     private int idReceta;
     private Recetas receta;
-    //private String[] usuarios; // Ahora será un arreglo de usuarios (nombres)
+    
     
     private Users usuario;  // Usuario asignado
     private final MySqlConnection objMySqlConnection;

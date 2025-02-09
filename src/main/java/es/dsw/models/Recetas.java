@@ -166,7 +166,7 @@ public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) 
     objMySqlConnection.open();  // Abrir la conexión
 
     if (!objMySqlConnection.isError()) {
-        System.out.println(sql);  // Para depuración, muestra la consulta generada
+        
         objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
         objMySqlConnection.close();  // Cerrar la conexión
         return true;  // Éxito al asignar
