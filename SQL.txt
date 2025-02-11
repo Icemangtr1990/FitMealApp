@@ -1,0 +1,87 @@
+DROP DATABASE IF EXISTS recetas_app;
+CREATE DATABASE recetas_app;
+USE recetas_app;
+
+-- Tabla Usuarios
+CREATE TABLE Usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    rol ENUM('usuario', 'admin') DEFAULT 'usuario'
+);
+
+-- Tabla Recetas
+CREATE TABLE Recetas (
+    id_receta INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_receta VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    instrucciones TEXT NOT NULL,
+    ingredientes JSON NOT NULL, -- Contiene ingredientes y cantidades en formato JSON
+    imagen VARCHAR(255), -- URL opcional para la imagen
+    id_usuario INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
+);
+
+-- Tabla Planificador
+CREATE TABLE Planificador (
+    id_planificador INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    fecha DATE NOT NULL,
+    id_receta INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_receta) REFERENCES Recetas(id_receta) ON DELETE CASCADE
+);
+
+INSERT INTO `recetas_app`.`usuarios` (`nombre`, `email`, `password`, `rol`) VALUES ('admin', 'admin@admin.es', '1234', 'admin');
+
+INSERT INTO `recetas_app`.`usuarios` (`nombre`, `email`, `password`, `rol`) VALUES ('pepe', 'pepe@gmail.com', '1234', 'usuario');
+
+
+INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) VALUES
+('Ensalada César', 'Clásica ensalada César con pollo y aderezo especial.', 
+'1. Lavar y cortar la lechuga. 2. Cocinar el pollo y cortarlo en tiras. 3. Mezclar con el queso, pan tostado y aderezo. 4. Servir fría.', 
+'[{"cantidad": "1 unidad", "ingrediente": "lechuga"}, {"cantidad": "200g", "ingrediente": "pollo"}, {"cantidad": "50g", "ingrediente": "queso parmesano"}]', 
+'ensalada_cesar.jpg', 1),
+
+('Pasta Carbonara', 'Receta italiana con panceta, huevo y queso.', 
+'1. Hervir la pasta. 2. Cocinar la panceta hasta que esté crujiente. 3. Mezclar la pasta caliente con huevo batido, panceta y queso parmesano.', 
+'[{"cantidad": "200g", "ingrediente": "pasta"}, {"cantidad": "100g", "ingrediente": "panceta"}, {"cantidad": "50g", "ingrediente": "queso parmesano"}, {"cantidad": "2 unidades", "ingrediente": "huevos"}]', 
+'pasta_carbonara.jpg', 1),
+
+('Tortilla de Patatas', 'Tortilla española con huevo y patata.', 
+'1. Pelar y cortar las patatas en rodajas finas. 2. Freírlas en aceite hasta que estén tiernas. 3. Mezclar con los huevos batidos y cocinar en una sartén.', 
+'[{"cantidad": "3 unidades", "ingrediente": "huevos"}, {"cantidad": "2 unidades", "ingrediente": "patatas"}, {"cantidad": "100ml", "ingrediente": "aceite de oliva"}, {"cantidad": "1 pizca", "ingrediente": "sal"}]', 
+'tortilla_patatas.jpg', 1);
+
+INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) VALUES
+('Lasaña de Carne', 'Deliciosa lasaña con carne y salsa bechamel.', 
+'1. Cocinar la carne con tomate y especias. 2. Preparar la salsa bechamel. 3. Armar la lasaña con capas de pasta, carne y salsa. 4. Hornear a 180°C por 30 minutos.', 
+'[{"cantidad": "250g", "ingrediente": "carne picada"}, {"cantidad": "200ml", "ingrediente": "salsa de tomate"}, {"cantidad": "100g", "ingrediente": "queso rallado"}, {"cantidad": "200ml", "ingrediente": "salsa bechamel"}, {"cantidad": "6 unidades", "ingrediente": "láminas de lasaña"}]', 
+'lasana_carne.jpg', 1),
+
+('Sopa de Verduras', 'Sopa nutritiva con verduras frescas.', 
+'1. Picar todas las verduras. 2. Cocinar en caldo durante 20 minutos. 3. Servir caliente.', 
+'[{"cantidad": "1 unidad", "ingrediente": "zanahoria"}, {"cantidad": "1 unidad", "ingrediente": "cebolla"}, {"cantidad": "2 unidades", "ingrediente": "patatas"}, {"cantidad": "500ml", "ingrediente": "caldo de verduras"}, {"cantidad": "1 pizca", "ingrediente": "sal"}]', 
+'sopa_verduras.jpg', 1),
+
+('Pollo al Curry', 'Pollo cocinado con especias y leche de coco.', 
+'1. Cortar el pollo en trozos y dorarlo en una sartén. 2. Agregar el curry y la leche de coco. 3. Cocinar a fuego lento durante 15 minutos. 4. Servir con arroz.', 
+'[{"cantidad": "200g", "ingrediente": "pechuga de pollo"}, {"cantidad": "200ml", "ingrediente": "leche de coco"}, {"cantidad": "1 cucharada", "ingrediente": "curry"}, {"cantidad": "150g", "ingrediente": "arroz"}]', 
+'pollo_curry.jpg', 1),
+
+('Hamburguesa Casera', 'Jugosa hamburguesa hecha en casa.', 
+'1. Mezclar la carne con especias y formar hamburguesas. 2. Cocinar en una sartén o parrilla. 3. Montar en pan con lechuga, tomate y queso.', 
+'[{"cantidad": "200g", "ingrediente": "carne molida"}, {"cantidad": "1 unidad", "ingrediente": "pan de hamburguesa"}, {"cantidad": "1 unidad", "ingrediente": "lechuga"}, {"cantidad": "1 unidad", "ingrediente": "tomate"}, {"cantidad": "1 loncha", "ingrediente": "queso"}]', 
+'hamburguesa_casera.jpg', 1),
+
+('Pescado al Horno', 'Filete de pescado con limón y hierbas.', 
+'1. Colocar el pescado en una bandeja con limón y hierbas. 2. Hornear a 180°C por 20 minutos.', 
+'[{"cantidad": "1 filete", "ingrediente": "pescado blanco"}, {"cantidad": "1 unidad", "ingrediente": "limón"}, {"cantidad": "1 pizca", "ingrediente": "sal"}, {"cantidad": "1 cucharada", "ingrediente": "hierbas provenzales"}]', 
+'pescado_horno.jpg', 1),
+
+('Batido de Fresas', 'Refrescante batido de fresas con leche.', 
+'1. Lavar y cortar las fresas. 2. Licuar con leche y azúcar. 3. Servir frío.', 
+'[{"cantidad": "200g", "ingrediente": "fresas"}, {"cantidad": "250ml", "ingrediente": "leche"}, {"cantidad": "1 cucharada", "ingrediente": "azúcar"}]', 
+'batido_fresas.jpg', 1);
+
