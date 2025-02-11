@@ -30,8 +30,6 @@ public class SecurityConfiguration {
 								  .requestMatchers("/images/**").permitAll()
 				    			  .requestMatchers("/index").permitAll()
 				    			  .requestMatchers("/loggin").permitAll()
-								  .requestMatchers("/recetas/**").permitAll()
-								  .requestMatchers("/agregarReceta").permitAll()
 								  .requestMatchers("/agregarReceta/**").hasRole("admin")
 								  .requestMatchers("/crearUsuario/**").hasRole("admin")
 								  .requestMatchers("/admin/listar-usuarios/**").hasRole("admin")
