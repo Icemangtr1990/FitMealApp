@@ -90,15 +90,16 @@ public class Recetas {
             stmt.setString(5, this.imagen);
             stmt.setInt(6, this.idUsuario);
             
-            stmt.executeUpdate();  // Ejecutar la inserción
-            return true;  // Si la inserción fue exitosa
+            stmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
         }
     }
-    
-    objMySqlConnection.close();  // Cerrar la conexión
-    return false;  // Retornar falso si hubo algún error
+
+    return false;
 }
 
 
@@ -143,58 +144,70 @@ public class Recetas {
 
 
 public boolean eliminarReceta(int idReceta) {
-    String sql = "DELETE FROM recetas WHERE id_receta = " + idReceta;
+    String sql = "DELETE FROM recetas WHERE id_receta = ?";
 
-    objMySqlConnection.open();  // Abrir la conexión
+    objMySqlConnection.open();
 
     if (!objMySqlConnection.isError()) {
-        objMySqlConnection.executeInsert(sql);  // Ejecutar eliminación
-        objMySqlConnection.close();  // Cerrar la conexión
-        return true;  // Éxito al eliminar
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idReceta);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
     } else {
         System.out.println("Error al eliminar receta: " + objMySqlConnection.msgError());
     }
 
-    objMySqlConnection.close();  // Asegurar cierre de conexión
-    return false;  // Fallo al eliminar
+    return false;
 }
 
 public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) {
-    String sql = "INSERT INTO Planificador (id_usuario, fecha, id_receta) VALUES (" +
-                 idUsuario + ", '" + fecha + "', " + idReceta + ");";
+    String sql = "INSERT INTO Planificador (id_usuario, fecha, id_receta) VALUES (?, ?, ?)";
 
-    objMySqlConnection.open();  // Abrir la conexión
+    objMySqlConnection.open();
 
     if (!objMySqlConnection.isError()) {
-        
-        objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
-        objMySqlConnection.close();  // Cerrar la conexión
-        return true;  // Éxito al asignar
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            stmt.setString(2, fecha);
+            stmt.setInt(3, idReceta);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
     } else {
         System.out.println("Error al asignar receta: " + objMySqlConnection.msgError());
     }
 
-    return false;  // Si hubo un error
+    return false;
 }
 
 public ArrayList<Recetas> obtenerListaDeCompras(int idUsuario) {
     String sql = "SELECT r.nombre_receta, r.ingredientes " +
                  "FROM Recetas r " +
                  "JOIN Planificador p ON r.id_receta = p.id_receta " +
-                 "WHERE p.id_usuario = " + idUsuario;
+                 "WHERE p.id_usuario = ?";
 
     ArrayList<Recetas> listaCompras = new ArrayList<>();
     objMySqlConnection.open();
 
     if (!objMySqlConnection.isError()) {
-        ResultSet rs = objMySqlConnection.executeSelect(sql);
-
-        try {
-            while (rs.next()) {
-                Recetas receta = new Recetas();
-                receta.setNombreReceta(rs.getString("nombre_receta"));
-                receta.setIngredientes(rs.getString("ingredientes"));
-                listaCompras.add(receta);
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Recetas receta = new Recetas();
+                    receta.setNombreReceta(rs.getString("nombre_receta"));
+                    receta.setIngredientes(rs.getString("ingredientes"));
+                    receta.setIngredientes(receta.getIngredientesFormateados());
+                    listaCompras.add(receta);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +28,13 @@ import jakarta.servlet.http.HttpSession;
 @SessionAttributes({"DataUser","usuario","rol","idUsuario"})
 public class MainController {
 
-    
-	
+	private final PasswordEncoder passwordEncoder;
+
+	public MainController(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+
 	@GetMapping(value= {"/loggin"})
 	public String loggin() {
 		
@@ -125,7 +131,7 @@ public String mostrarRecetas(Model model) {
 
 
 
-@GetMapping("/agregarReceta")
+@PostMapping("/agregarReceta")
 public String agregarReceta(@RequestParam("nombre") String nombreReceta,
                              @RequestParam("descripcion") String descripcion,
                              @RequestParam("cantidad") String[] cantidades,  // Recibir un array de cantidades
@@ -162,8 +168,19 @@ public String agregarReceta(@RequestParam("nombre") String nombreReceta,
     nuevaReceta.setDescripcion(descripcion);
     nuevaReceta.setInstrucciones(instrucciones);
     nuevaReceta.setIngredientes(ingredientesJson.toString());  // Setear los ingredientes en formato JSON
-    nuevaReceta.setImagen(imagen != null && !imagen.trim().isEmpty() ? imagen : null);  // Si la imagen está vacía, asignar null
-    nuevaReceta.setIdUsuario(1);  // Aquí puedes poner el ID del usuario autenticado si lo tienes
+    nuevaReceta.setImagen(imagen != null && !imagen.trim().isEmpty() ? imagen : null);
+
+    // El autor de la receta es el usuario autenticado, no un ID fijo.
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nombreUsuario = (auth != null && auth.getPrincipal() instanceof UserDetails)
+            ? ((UserDetails) auth.getPrincipal()).getUsername()
+            : null;
+    Users autor = nombreUsuario != null ? new Users().getUserByUsername(nombreUsuario) : null;
+    if (autor == null) {
+        System.out.println("No se pudo identificar al usuario autenticado.");
+        return "redirect:/recetas";
+    }
+    nuevaReceta.setIdUsuario(autor.getIdUser());
 
     // Intentar insertar la receta en la base de datos
     boolean success = nuevaReceta.insertReceta();
@@ -240,7 +257,7 @@ public String mostrarPlanificador(Model model, HttpSession session) {
     Integer idUsuario = (Integer) session.getAttribute("idUsuario"); // Obtener ID del usuario logueado
 
     if (idUsuario == null) {
-        return "redirect:/login"; // Redirigir si no está logueado
+        return "redirect:/index"; // La vista de acceso es /index (o /loggin)
     }
 
     Planificador planificador = new Planificador();
@@ -255,8 +272,12 @@ public String mostrarPlanificador(Model model, HttpSession session) {
 
 @GetMapping("/compras")
 public String mostrarListaCompras(Model model,HttpSession session) {
-    Integer idUsuario = (Integer) session.getAttribute("idUsuario"); // Obtener ID del usuario logueado
-    
+    Integer idUsuario = (Integer) session.getAttribute("idUsuario");
+
+    if (idUsuario == null) {
+        return "redirect:/index";
+    }
+
     Recetas receta = new Recetas();
     
     List<Recetas> listaCompras = receta.obtenerListaDeCompras(idUsuario);  
@@ -280,7 +301,7 @@ public String crearUsuario(@RequestParam String nombre,
 
     Users nuevoUsuario = new Users();
     nuevoUsuario.setNombre(nombre);
-    nuevoUsuario.setPasswd(passwd);  // Sin cifrar
+    nuevoUsuario.setPasswd(passwordEncoder.encode(passwd));  // Hash BCrypt
     nuevoUsuario.setEmail(email);
     nuevoUsuario.setUserRole(userRole);
 

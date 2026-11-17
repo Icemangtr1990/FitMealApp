@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS recetas_app;
-CREATE DATABASE recetas_app;
+CREATE DATABASE recetas_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE recetas_app;
 
 -- Tabla Usuarios
@@ -9,7 +9,7 @@ CREATE TABLE Usuarios (
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     rol ENUM('usuario', 'admin') DEFAULT 'usuario'
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla Recetas
 CREATE TABLE Recetas (
@@ -21,7 +21,7 @@ CREATE TABLE Recetas (
     imagen VARCHAR(255), -- URL opcional para la imagen
     id_usuario INT NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla Planificador
 CREATE TABLE Planificador (
@@ -31,7 +31,7 @@ CREATE TABLE Planificador (
     id_receta INT NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES Usuarios(id_usuario) ON DELETE CASCADE,
     FOREIGN KEY (id_receta) REFERENCES Recetas(id_receta) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `recetas_app`.`usuarios` (`nombre`, `email`, `password`, `rol`) VALUES ('admin', 'admin@admin.es', '1234', 'admin');
 

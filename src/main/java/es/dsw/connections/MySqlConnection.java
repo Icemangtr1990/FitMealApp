@@ -1,11 +1,13 @@
 package es.dsw.connections;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 //[2] - CONSTRUCCIÓN DE LA CLASE CONECTORA
 
@@ -25,16 +27,37 @@ public class MySqlConnection {
 	//Aunque en este ejemplo los datos de conexión están en código, siempre es recomendable que esta
 	//parametrización figure en un fichero de propiedades.
 	
-	//Nombre del host
-	private String host = "localhost";
-	//Puerto
-	private String puerto = "3306";
-	//Nombre de la base de datos
-	private String nameDB = "recetas_app";
-	//Usuario de conexión
-	private String usuario = "root";
-	//Contraseña
-	private String password = "1234";
+	// Parámetros de conexión: se leen de application.properties y se pueden
+	// sobrescribir con variables de entorno (FITMEAL_DB_*).
+	private static final Properties DB_PROPS = loadDbProperties();
+
+	private String host = envOrDefault("FITMEAL_DB_HOST", "fitmeal.db.host", "localhost");
+	private String puerto = envOrDefault("FITMEAL_DB_PORT", "fitmeal.db.port", "3306");
+	private String nameDB = envOrDefault("FITMEAL_DB_NAME", "fitmeal.db.name", "recetas_app");
+	private String usuario = envOrDefault("FITMEAL_DB_USER", "fitmeal.db.username", "root");
+	private String password = envOrDefault("FITMEAL_DB_PASSWORD", "fitmeal.db.password", "1234");
+
+	private static Properties loadDbProperties() {
+		Properties props = new Properties();
+		try (InputStream in = MySqlConnection.class.getClassLoader()
+				.getResourceAsStream("application.properties")) {
+			if (in != null) {
+				props.load(in);
+			}
+		} catch (Exception e) {
+			System.err.println("No se pudo leer application.properties: " + e.getMessage());
+		}
+		return props;
+	}
+
+	private static String envOrDefault(String envKey, String propKey, String defaultValue) {
+		String env = System.getenv(envKey);
+		if (env != null && !env.isBlank()) {
+			return env;
+		}
+		String prop = DB_PROPS.getProperty(propKey);
+		return (prop != null && !prop.isBlank()) ? prop : defaultValue;
+	}
 	
 	//Atributo que indica si las operaciones se realizarán con autocomit. De lo contrario, en la capa de datos (DAO's) se
 	//debe controlar las transacciones.
@@ -126,7 +149,9 @@ public class MySqlConnection {
 			  //Se carga el jdbc
 			  Class.forName("com.mysql.cj.jdbc.Driver");
 			  //Se indican los datos de conexión y se intenta obtener el objeto abierto (esta instrucción es crítica)
-			  this.connection = DriverManager.getConnection("jdbc:mysql://"+this.host+":"+this.puerto+"/"+this.nameDB, this.usuario, this.password);
+			  this.connection = DriverManager.getConnection(
+			      "jdbc:mysql://"+this.host+":"+this.puerto+"/"+this.nameDB
+			      + "?useUnicode=true&characterEncoding=utf8", this.usuario, this.password);
 			  //Se indica si se realizará autocomit (cada operación será independiente) o si se estará en modo de transacción (delega en la capa de datos el commit).
 			  this.connection.setAutoCommit(this.autocomit);
 			  System.out.println("Open conexion");

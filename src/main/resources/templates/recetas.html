@@ -56,7 +56,7 @@
         
         <div sec:authorize="hasRole('admin')" class="mt-4">
             <h2>Agregar Receta</h2>
-            <form action="/agregarReceta" method="GET" class="form-group">
+            <form th:action="@{/agregarReceta}" method="post" class="form-group">
                 <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre de la receta" required>
                 <input type="text" name="descripcion" class="form-control mb-2" placeholder="Descripción" required>
 

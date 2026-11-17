@@ -118,41 +118,76 @@ public class Users {
 
 
 public boolean insertUser() {
-    String sql = "INSERT INTO usuarios (nombre, password, email, rol) " +
-                 "VALUES ('" + this.nombre + "', " +
-                 "'" + this.passwd + "', " +
-                 "'" + this.email + "', " +
-                 "'" + this.userRole + "');";
+    String sql = "INSERT INTO usuarios (nombre, password, email, rol) VALUES (?, ?, ?, ?)";
 
-    objMySqlConnection.open();  // Abrir la conexión a la base de datos
-    
+    objMySqlConnection.open();
+
     if (!objMySqlConnection.isError()) {
-       
-        objMySqlConnection.executeInsert(sql);  // Ejecutar la inserción
-        objMySqlConnection.close();  // Cerrar la conexión
-        return true;  // Si la inserción fue exitosa
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, this.nombre);
+            stmt.setString(2, this.passwd);
+            stmt.setString(3, this.email);
+            stmt.setString(4, this.userRole);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
     } else {
         System.out.println("Error en conexión: " + objMySqlConnection.msgError());
     }
 
-    return false;  // Si hubo error en la inserción
+    return false;
 }
 
 public boolean eliminarUsuario(int idUsuario) {
-    String sql = "DELETE FROM usuarios WHERE id_usuario = " + idUsuario;
-    
-    objMySqlConnection.open();  // Abrir la conexión a la base de datos
-    
+    String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
+
+    objMySqlConnection.open();
+
     if (!objMySqlConnection.isError()) {
-        
-        objMySqlConnection.executeInsert(sql);  // Ejecutar la eliminación
-        objMySqlConnection.close();  // Cerrar la conexión
-        return true;  // Si la eliminación fue exitosa
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idUsuario);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
     } else {
         System.out.println("Error en conexión: " + objMySqlConnection.msgError());
     }
-    
-    return false;  // Si hubo error al eliminar
+
+    return false;
+}
+
+/**
+ * Actualiza el hash de la contraseña de un usuario. Se usa para migrar las
+ * contraseñas en texto plano del proyecto académico a hashes BCrypt.
+ */
+public boolean actualizarPassword(int idUsuario, String passwordHash) {
+    String sql = "UPDATE usuarios SET password = ? WHERE id_usuario = ?";
+
+    objMySqlConnection.open();
+
+    if (!objMySqlConnection.isError()) {
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, passwordHash);
+            stmt.setInt(2, idUsuario);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            objMySqlConnection.close();
+        }
+    } else {
+        System.out.println("Error en conexión: " + objMySqlConnection.msgError());
+    }
+
+    return false;
 }
 
     
