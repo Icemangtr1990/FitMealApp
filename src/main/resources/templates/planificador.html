@@ -58,7 +58,7 @@
                 <div class="card-body">
                     <h3 class="card-title" th:text="${receta.nombreReceta}">Nombre de la receta</h3>
                     <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}"></span></p>
-                    <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientes}"></span></p>
+                    <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}"></span></p>
                     <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}" class="text-wrap"></span></p>
                     <p><strong>Fecha:</strong> <span th:text="${receta.fechaFormateada}"></span></p>
                 </div>

@@ -119,7 +119,7 @@
                     <li class="list-group-item mb-3">
                         <h3 th:text="${receta.nombreReceta}">Nombre de la receta</h3>
                         <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}">Descripción aquí</span></p>
-                        <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientes}">Ingredientes aquí</span></p>
+                        <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}">Ingredientes aquí</span></p>
                         <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}">Instrucciones aquí</span></p>
 
                         <div sec:authorize="hasRole('admin')">
