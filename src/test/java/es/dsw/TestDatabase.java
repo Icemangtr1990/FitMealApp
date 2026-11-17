@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 /**
  * Crea un esquema pequeño y datos de prueba en la base de datos H2 en memoria.
  * Se usa antes de cada test para que cada prueba empiece desde cero.
@@ -46,9 +48,11 @@ public final class TestDatabase {
 					+ "FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE, "
 					+ "FOREIGN KEY (id_receta) REFERENCES recetas(id_receta) ON DELETE CASCADE)");
 
+			String adminHash = new BCryptPasswordEncoder().encode("1234");
+			String pepeHash = new BCryptPasswordEncoder().encode("1234");
 			statement.execute("INSERT INTO usuarios (nombre, email, password, rol) VALUES "
-					+ "('admin', 'admin@test.es', 'hash_admin', 'admin'), "
-					+ "('pepe', 'pepe@test.es', 'hash_pepe', 'usuario')");
+					+ "('admin', 'admin@test.es', '" + adminHash + "', 'admin'), "
+					+ "('pepe', 'pepe@test.es', '" + pepeHash + "', 'usuario')");
 
 			statement.execute("INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) VALUES "
 					+ "('Ensalada Cesar', 'desc', 'inst', "

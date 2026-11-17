@@ -197,7 +197,9 @@ src/main/resources/
 ├── static/                          # css e imágenes del carrusel
 └── templates/                       # vistas Thymeleaf (8 plantillas)
 
-src/test/                            # 11 tests JUnit 5 con H2
+src/main/resources/db/migration/    # V1__init.sql (Flyway)
+src/test/                            # 16 tests JUnit 5 con H2 + MockMvc
+.github/workflows/ci.yml             # CI: build + tests en cada push
 SQL.txt                              # esquema, índices y datos de ejemplo
 pom.xml                              # dependencias Maven
 ```
@@ -214,7 +216,12 @@ pom.xml                              # dependencias Maven
 - **Seguridad**: contraseñas con **BCrypt** (con migración automática de las del `SQL.txt`), configuración de BD externalizable, **PreparedStatement** en todas las consultas y mutaciones por **POST** con token CSRF de Thymeleaf.
 - **Autenticación contra BD**: `DbUserDetailsService` consulta MySQL en cada login, así que los usuarios creados o eliminados desde la interfaz surten efecto **sin reiniciar** la aplicación.
 - **Agregación en la compra**: los ingredientes repetidos se agrupan en `ItemCompra`, sumando cantidades cuando comparten unidad y mostrando de qué recetas proceden.
-- **Pruebas automáticas**: 11 tests con JUnit 5 y H2 en memoria que cubren la agrupación/filtrado de la compra, la inserción parametrizada de usuarios, el hash BCrypt y la carga del contexto. Ejecutar con `.\mvnw.cmd test`.
+- **Pruebas automáticas**: 16 tests con JUnit 5, H2 en memoria y MockMvc (modelos, compra, roles de seguridad, login, BCrypt y carga del contexto). Cobertura con **JaCoCo**. Ejecutar con `.\mvnw.cmd test`.
+- **Migraciones con Flyway**: `V1__init.sql` versiona el esquema; la BD existente se baseslinea automáticamente. `SQL.txt` se conserva como referencia.
+- **Transacciones**: los servicios de escritura usan `@Transactional`.
+- **Perfiles**: `application-dev.properties` (logs detallados) y `application-prod.properties` (credenciales solo por variables de entorno).
+- **CI**: GitHub Actions ejecuta `./mvnw -B clean verify` en cada push a `master`.
+- **Acceso por roles reforzado**: todo `/admin/**` exige `ROLE_admin` (un test detectó que crear usuarios solo pedía autenticación).
 - **Arquitectura por capas**: entidades POJO → repositorios (`JdbcTemplate`) → servicios → controlador. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot en lugar de `DriverManager`.
 - **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
 - **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.

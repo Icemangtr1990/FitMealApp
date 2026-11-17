@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,14 +28,17 @@ public class RecetasService {
 		return repository.findAll();
 	}
 
+	@Transactional
 	public boolean crear(Recetas receta) {
 		return repository.insert(receta);
 	}
 
+	@Transactional
 	public boolean eliminar(int idReceta) {
 		return repository.deleteById(idReceta);
 	}
 
+	@Transactional
 	public boolean asignar(int idReceta, int idUsuario, String fecha) {
 		return repository.assign(idReceta, idUsuario, fecha);
 	}

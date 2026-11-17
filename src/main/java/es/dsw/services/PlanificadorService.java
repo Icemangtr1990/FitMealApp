@@ -3,6 +3,7 @@ package es.dsw.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.dsw.models.Planificador;
 import es.dsw.repositories.PlanificadorRepository;
@@ -20,6 +21,7 @@ public class PlanificadorService {
 		return repository.findRecetasConUsuarios();
 	}
 
+	@Transactional
 	public boolean eliminarAsignacion(int idUsuario, int idReceta) {
 		return repository.deleteAsignacion(idUsuario, idReceta);
 	}

@@ -3,6 +3,7 @@ package es.dsw.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.dsw.models.Users;
 import es.dsw.repositories.UsuariosRepository;
@@ -24,14 +25,17 @@ public class UsuariosService {
 		return repository.findByUsername(username);
 	}
 
+	@Transactional
 	public boolean crear(Users usuario) {
 		return repository.insert(usuario);
 	}
 
+	@Transactional
 	public boolean eliminar(int idUsuario) {
 		return repository.deleteById(idUsuario);
 	}
 
+	@Transactional
 	public void actualizarPassword(int idUsuario, String hash) {
 		repository.updatePassword(idUsuario, hash);
 	}
