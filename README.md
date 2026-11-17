@@ -11,7 +11,7 @@ Incluye autenticación con dos roles (`usuario` y `admin`), gestión de recetas,
 - **Autenticación y autorización** con Spring Security y control de acceso por roles.
 - **Alta de recetas** con nombre, descripción, instrucciones, imagen e ingredientes con cantidades añadidos dinámicamente desde el navegador.
 - **Planificador**: asignar recetas a usuarios y fechas, y consultar las recetas asignadas al usuario autenticado.
-- **Lista de la compra** generada a partir de las recetas planificadas, con los ingredientes formateados (`cantidad de ingrediente`).
+- **Lista de la compra** generada a partir de las recetas planificadas: ingredientes **agrupados** (sumando cantidades con la misma unidad, p. ej. `200 g + 150 g = 350 g`) y **filtrables por rango de fechas**.
 - **Panel de administración**: crear y eliminar usuarios y recetas, y ver las asignaciones.
 - **Interfaz responsive** con Bootstrap 5 y plantillas Thymeleaf.
 
@@ -157,7 +157,7 @@ Los ingredientes se almacenan como JSON:
 | POST | `/asignarReceta` | Asignar receta a usuario y fecha | Autenticado |
 | POST | `/eliminarAsignacion` | Quitar asignación | Autenticado |
 | GET | `/planificador` | Recetas planificadas del usuario | Autenticado |
-| GET | `/compras` | Lista de la compra | Autenticado |
+| GET | `/compras` | Lista de la compra (acepta `fechaDesde` y `fechaHasta`) | Autenticado |
 | GET | `/crearUsuario` | Formulario de alta de usuario | Admin |
 | POST | `/admin/crear-usuario` | Crear usuario | Admin |
 | GET | `/admin/listar-usuarios` | Listado de usuarios | Admin |
@@ -205,6 +205,7 @@ pom.xml                              # dependencias Maven
 - **Control de acceso en dos niveles**: reglas en `SecurityConfiguration` y directivas `sec:authorize` en las plantillas.
 - **Seguridad**: contraseñas con **BCrypt** (con migración automática de las del `SQL.txt`), configuración de BD externalizable, **PreparedStatement** en todas las consultas y mutaciones por **POST** con token CSRF de Thymeleaf.
 - **Autenticación contra BD**: `DbUserDetailsService` consulta MySQL en cada login, así que los usuarios creados o eliminados desde la interfaz surten efecto **sin reiniciar** la aplicación.
+- **Agregación en la compra**: los ingredientes repetidos se agrupan en `ItemCompra`, sumando cantidades cuando comparten unidad y mostrando de qué recetas proceden.
 
 ---
 
@@ -215,7 +216,6 @@ Aspectos que se abordarían en un entorno profesional:
 - Separar entidades, repositorios y servicios (o migrar a **Spring Data JPA**).
 - Sustituir `DriverManager` por un **pool de conexiones** (HikariCP, incluido en Spring Boot).
 - Añadir **tests de integración** con H2 para las capas de datos y controladores.
-- Agrupar ingredientes repetidos en la lista de la compra y filtrarla por rango de fechas.
 
 ---
 

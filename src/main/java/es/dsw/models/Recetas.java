@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -188,25 +189,59 @@ public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) 
     return false;
 }
 
-public ArrayList<Recetas> obtenerListaDeCompras(int idUsuario) {
-    String sql = "SELECT r.nombre_receta, r.ingredientes " +
-                 "FROM Recetas r " +
-                 "JOIN Planificador p ON r.id_receta = p.id_receta " +
-                 "WHERE p.id_usuario = ?";
+public List<ItemCompra> obtenerListaDeCompras(int idUsuario, String fechaDesde, String fechaHasta) {
+    StringBuilder sql = new StringBuilder(
+            "SELECT r.nombre_receta, r.ingredientes " +
+            "FROM Recetas r " +
+            "JOIN Planificador p ON r.id_receta = p.id_receta " +
+            "WHERE p.id_usuario = ?");
 
-    ArrayList<Recetas> listaCompras = new ArrayList<>();
+    List<String> filtros = new ArrayList<>();
+    if (fechaDesde != null && !fechaDesde.isBlank()) {
+        sql.append(" AND p.fecha >= ?");
+        filtros.add(fechaDesde);
+    }
+    if (fechaHasta != null && !fechaHasta.isBlank()) {
+        sql.append(" AND p.fecha <= ?");
+        filtros.add(fechaHasta);
+    }
+    sql.append(" ORDER BY r.nombre_receta");
+
+    Map<String, ItemCompra> agrupados = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     objMySqlConnection.open();
 
     if (!objMySqlConnection.isError()) {
-        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql.toString())) {
             stmt.setInt(1, idUsuario);
+            for (int i = 0; i < filtros.size(); i++) {
+                stmt.setString(i + 2, filtros.get(i));
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Recetas receta = new Recetas();
-                    receta.setNombreReceta(rs.getString("nombre_receta"));
-                    receta.setIngredientes(rs.getString("ingredientes"));
-                    receta.setIngredientes(receta.getIngredientesFormateados());
-                    listaCompras.add(receta);
+                    String nombreReceta = rs.getString("nombre_receta");
+                    String json = rs.getString("ingredientes");
+                    if (json == null || json.isBlank()) {
+                        continue;
+                    }
+
+                    List<Map<String, String>> ingredientes;
+                    try {
+                        ingredientes = mapper.readValue(json, List.class);
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    for (Map<String, String> ingrediente : ingredientes) {
+                        String nombre = ingrediente.get("ingrediente");
+                        if (nombre == null || nombre.isBlank()) {
+                            continue;
+                        }
+                        String clave = nombre.trim();
+                        ItemCompra item = agrupados.computeIfAbsent(clave, ItemCompra::new);
+                        item.anadir(ingrediente.get("cantidad"), nombreReceta);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -218,7 +253,7 @@ public ArrayList<Recetas> obtenerListaDeCompras(int idUsuario) {
         System.out.println("Error al ejecutar la consulta: " + objMySqlConnection.msgError());
     }
 
-    return listaCompras;
+    return new ArrayList<>(agrupados.values());
 }
 
  public String getIngredientesFormateados() {

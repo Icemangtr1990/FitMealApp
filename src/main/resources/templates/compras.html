@@ -50,31 +50,54 @@
 
     <!-- Contenido Principal -->
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Planificador Semanal</h1>
+        <h1 class="text-center mb-4">Lista de la compra</h1>
 
-        <h2 class="text-center mb-4">Tus lista de la compra</h2>
-        
-            <div th:each="receta : ${listaCompras}" class="mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h3 class="card-title" th:text="${receta.nombreReceta}"></h3>
-                        <p class="card-text">
-                            <strong>Ingredientes:</strong>
-                            <p><span th:text="${receta.ingredientesFormateados}"></span></p>
-                        </p> 
-                    </div>
-                </div>
+        <form method="get" th:action="@{/compras}" class="row g-2 align-items-end justify-content-center mb-4">
+            <div class="col-auto">
+                <label for="fechaDesde" class="form-label mb-0">Desde</label>
+                <input type="date" class="form-control" id="fechaDesde" name="fechaDesde"
+                       th:value="${fechaDesde}">
             </div>
-        
+            <div class="col-auto">
+                <label for="fechaHasta" class="form-label mb-0">Hasta</label>
+                <input type="date" class="form-control" id="fechaHasta" name="fechaHasta"
+                       th:value="${fechaHasta}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+            <div class="col-auto">
+                <a th:href="@{/compras}" class="btn btn-outline-secondary">Ver todas</a>
+            </div>
+        </form>
 
-        
+        <div th:if="${#lists.isEmpty(listaCompras)}" class="alert alert-info text-center">
+            No hay ingredientes para las fechas seleccionadas.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(listaCompras)}" class="card">
+            <div class="card-body">
+                <h2 class="h5 card-title mb-3">Ingredientes agrupados</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        th:each="item : ${listaCompras}">
+                        <span th:text="${item.ingrediente}">Ingrediente</span>
+                        <span class="text-end">
+                            <strong th:text="${item.cantidadTotal}">Cantidad</strong>
+                            <small class="text-muted d-block" th:text="'Recetas: ' + ${item.recetasTexto}"></small>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
     </div>
 
     <!-- Footer -->
     <footer class="bg-light text-center py-3 mt-5">
         <div class="container">
-            <span class="text-muted">© 2025 FitMealApp. Todos los derechos reservados.</span>
+            <span class="text-muted">© 2026 FitMealApp. Todos los derechos reservados.</span>
         </div>
     </footer>
 

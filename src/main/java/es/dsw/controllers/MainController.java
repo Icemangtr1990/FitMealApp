@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import es.dsw.models.ItemCompra;
 import es.dsw.models.Planificador;
 import es.dsw.models.Recetas;
 import es.dsw.models.Users;
@@ -271,7 +272,11 @@ public String mostrarPlanificador(Model model, HttpSession session) {
 
 
 @GetMapping("/compras")
-public String mostrarListaCompras(Model model,HttpSession session) {
+public String mostrarListaCompras(
+        @RequestParam(value = "fechaDesde", required = false) String fechaDesde,
+        @RequestParam(value = "fechaHasta", required = false) String fechaHasta,
+        Model model, HttpSession session) {
+
     Integer idUsuario = (Integer) session.getAttribute("idUsuario");
 
     if (idUsuario == null) {
@@ -279,11 +284,13 @@ public String mostrarListaCompras(Model model,HttpSession session) {
     }
 
     Recetas receta = new Recetas();
-    
-    List<Recetas> listaCompras = receta.obtenerListaDeCompras(idUsuario);  
-    model.addAttribute("listaCompras", listaCompras);  
 
-    return "compras";  
+    List<ItemCompra> listaCompras = receta.obtenerListaDeCompras(idUsuario, fechaDesde, fechaHasta);
+    model.addAttribute("listaCompras", listaCompras);
+    model.addAttribute("fechaDesde", fechaDesde);
+    model.addAttribute("fechaHasta", fechaHasta);
+
+    return "compras";
 }
 
     @GetMapping("/crearUsuario")
