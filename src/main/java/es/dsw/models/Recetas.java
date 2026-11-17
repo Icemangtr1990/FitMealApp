@@ -1,290 +1,74 @@
 package es.dsw.models;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import es.dsw.connections.MySqlConnection;
-
+/** Entidad receta. El acceso a datos está en RecetasRepository. */
 public class Recetas {
-    
-    // Atributos de la receta
-    private int idReceta;
-    private String nombreReceta;
-    private String descripcion;
-    private String instrucciones;
-    private String ingredientes;  // Utilizando JSON como String
-    private String imagen;
-    private int idUsuario;  // Relación con la tabla usuarios
-    private Date fecha;
-    
 
-    
-    private final MySqlConnection objMySqlConnection;
-    
-    public Recetas() {
-        objMySqlConnection = new MySqlConnection();
-    }
+	private int idReceta;
+	private String nombreReceta;
+	private String descripcion;
+	private String instrucciones;
+	private String ingredientes;  // JSON en texto
+	private String imagen;
+	private int idUsuario;
+	private Date fecha;
 
-    // Métodos Getter y Setter
+	public int getIdReceta() { return idReceta; }
+	public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
 
-    
-    
-    public int getIdReceta() { return idReceta; }
-    public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
+	public String getNombreReceta() { return nombreReceta; }
+	public void setNombreReceta(String nombreReceta) { this.nombreReceta = nombreReceta; }
 
-    public String getNombreReceta() { return nombreReceta; }
-    public void setNombreReceta(String nombreReceta) { this.nombreReceta = nombreReceta; }
+	public String getDescripcion() { return descripcion; }
+	public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+	public String getInstrucciones() { return instrucciones; }
+	public void setInstrucciones(String instrucciones) { this.instrucciones = instrucciones; }
 
-    public String getInstrucciones() { return instrucciones; }
-    public void setInstrucciones(String instrucciones) { this.instrucciones = instrucciones; }
+	public String getIngredientes() { return ingredientes; }
+	public void setIngredientes(String ingredientes) { this.ingredientes = ingredientes; }
 
-    public String getIngredientes() { return ingredientes; }
-    public void setIngredientes(String ingredientes) { this.ingredientes = ingredientes; }
+	public String getImagen() { return imagen; }
+	public void setImagen(String imagen) { this.imagen = imagen; }
 
-    public String getImagen() { return imagen; }
-    public void setImagen(String imagen) { this.imagen = imagen; }
+	public int getIdUsuario() { return idUsuario; }
+	public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 
-    public int getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+	public Date getFecha() { return fecha; }
+	public void setFecha(Date fecha) { this.fecha = fecha; }
 
-    public Date getFecha() {
-        return fecha;
-    }
+	public String getFechaFormateada() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		return fecha == null ? "" : sdf.format(fecha);
+	}
 
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
+	/** Convierte el JSON de ingredientes en texto legible. */
+	public String getIngredientesFormateados() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			List<Map<String, String>> ingredientesList = objectMapper.readValue(ingredientes, List.class);
+			StringBuilder resultado = new StringBuilder();
 
-    public String getFechaFormateada() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        return sdf.format(fecha);
-    }
+			for (Map<String, String> ingrediente : ingredientesList) {
+				resultado.append(ingrediente.get("cantidad"))
+						.append(" de ")
+						.append(ingrediente.get("ingrediente"))
+						.append(", ");
+			}
 
-   
-    
+			if (resultado.length() > 0) {
+				resultado.setLength(resultado.length() - 2);
+			}
+			return resultado.toString();
+		} catch (Exception e) {
+			return "";
+		}
+	}
 
-    public boolean insertReceta() {
-    String sql = "INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) " +
-                 "VALUES (?, ?, ?, ?, ?, ?)";
-    
-    objMySqlConnection.open();  // Abrir la conexión a la base de datos
-    
-    if (!objMySqlConnection.isError()) {
-        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
-            // Establecer los parámetros de forma segura con PreparedStatement
-            stmt.setString(1, this.nombreReceta);
-            stmt.setString(2, this.descripcion);
-            stmt.setString(3, this.instrucciones);
-            stmt.setString(4, this.ingredientes);  // Aquí insertamos el JSON
-            stmt.setString(5, this.imagen);
-            stmt.setInt(6, this.idUsuario);
-            
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            objMySqlConnection.close();
-        }
-    }
-
-    return false;
-}
-
-
-    public List<Recetas> obtenerTodasLasRecetas() {
-    List<Recetas> listaRecetas = new ArrayList<>();
-    String sql = "SELECT * FROM recetas"; // Consulta SQL
-
-    objMySqlConnection.open(); // Abrimos la conexión
-
-    if (!objMySqlConnection.isError()) {
-        ResultSet rs = objMySqlConnection.executeSelect(sql); // Ejecutamos la consulta
-
-        try {
-            while (rs.next()) {
-                // Creamos un objeto Recetas y llenamos sus atributos
-                Recetas receta = new Recetas();
-                receta.setIdReceta(rs.getInt("id_receta"));
-                receta.setNombreReceta(rs.getString("nombre_receta"));
-                receta.setDescripcion(rs.getString("descripcion"));
-                receta.setInstrucciones(rs.getString("instrucciones"));
-                receta.setIngredientes(rs.getString("ingredientes"));
-                receta.setImagen(rs.getString("imagen"));
-                receta.setIdUsuario(rs.getInt("id_usuario"));
-                String ingredientesFormateados = receta.getIngredientesFormateados();
-                    receta.setIngredientes(ingredientesFormateados);
-
-                // Añadimos la receta a la lista
-                listaRecetas.add(receta);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error al procesar el ResultSet: " + e.getMessage());
-        } finally {
-            objMySqlConnection.close(); // Cerramos la conexión
-        }
-    } else {
-        System.out.println("Error en la conexión: " + objMySqlConnection.msgError());
-        objMySqlConnection.close(); // Cerramos la conexión en caso de error
-    }
-
-    return listaRecetas; // Devolvemos la lista de recetas
-}
-
-
-public boolean eliminarReceta(int idReceta) {
-    String sql = "DELETE FROM recetas WHERE id_receta = ?";
-
-    objMySqlConnection.open();
-
-    if (!objMySqlConnection.isError()) {
-        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, idReceta);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            objMySqlConnection.close();
-        }
-    } else {
-        System.out.println("Error al eliminar receta: " + objMySqlConnection.msgError());
-    }
-
-    return false;
-}
-
-public boolean asignarRecetaAUsuario(int idReceta, int idUsuario, String fecha) {
-    String sql = "INSERT INTO Planificador (id_usuario, fecha, id_receta) VALUES (?, ?, ?)";
-
-    objMySqlConnection.open();
-
-    if (!objMySqlConnection.isError()) {
-        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, idUsuario);
-            stmt.setString(2, fecha);
-            stmt.setInt(3, idReceta);
-            stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            objMySqlConnection.close();
-        }
-    } else {
-        System.out.println("Error al asignar receta: " + objMySqlConnection.msgError());
-    }
-
-    return false;
-}
-
-public List<ItemCompra> obtenerListaDeCompras(int idUsuario, String fechaDesde, String fechaHasta) {
-    StringBuilder sql = new StringBuilder(
-            "SELECT r.nombre_receta, r.ingredientes " +
-            "FROM Recetas r " +
-            "JOIN Planificador p ON r.id_receta = p.id_receta " +
-            "WHERE p.id_usuario = ?");
-
-    List<String> filtros = new ArrayList<>();
-    if (fechaDesde != null && !fechaDesde.isBlank()) {
-        sql.append(" AND p.fecha >= ?");
-        filtros.add(fechaDesde);
-    }
-    if (fechaHasta != null && !fechaHasta.isBlank()) {
-        sql.append(" AND p.fecha <= ?");
-        filtros.add(fechaHasta);
-    }
-    sql.append(" ORDER BY r.nombre_receta");
-
-    Map<String, ItemCompra> agrupados = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    objMySqlConnection.open();
-
-    if (!objMySqlConnection.isError()) {
-        try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql.toString())) {
-            stmt.setInt(1, idUsuario);
-            for (int i = 0; i < filtros.size(); i++) {
-                stmt.setString(i + 2, filtros.get(i));
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String nombreReceta = rs.getString("nombre_receta");
-                    String json = rs.getString("ingredientes");
-                    if (json == null || json.isBlank()) {
-                        continue;
-                    }
-
-                    List<Map<String, String>> ingredientes;
-                    try {
-                        ingredientes = mapper.readValue(json, List.class);
-                    } catch (Exception e) {
-                        continue;
-                    }
-
-                    for (Map<String, String> ingrediente : ingredientes) {
-                        String nombre = ingrediente.get("ingrediente");
-                        if (nombre == null || nombre.isBlank()) {
-                            continue;
-                        }
-                        String clave = nombre.trim();
-                        ItemCompra item = agrupados.computeIfAbsent(clave, ItemCompra::new);
-                        item.anadir(ingrediente.get("cantidad"), nombreReceta);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            objMySqlConnection.close();
-        }
-    } else {
-        System.out.println("Error al ejecutar la consulta: " + objMySqlConnection.msgError());
-    }
-
-    return new ArrayList<>(agrupados.values());
-}
-
- public String getIngredientesFormateados() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            // Parsear la cadena JSON a una lista de mapas
-            List<Map<String, String>> ingredientesList = objectMapper.readValue(ingredientes, List.class);
-            StringBuilder ingredientesFormateados = new StringBuilder();
-            
-            // Formatear la lista de ingredientes en un formato más natural
-            for (Map<String, String> ingrediente : ingredientesList) {
-                String cantidad = ingrediente.get("cantidad");
-                String ingredienteNombre = ingrediente.get("ingrediente");
-                ingredientesFormateados.append(cantidad).append(" de ").append(ingredienteNombre).append(", ");
-            }
-            
-            // Eliminar la última coma y espacio
-            if (ingredientesFormateados.length() > 0) {
-                ingredientesFormateados.setLength(ingredientesFormateados.length() - 2);
-            }
-
-            return ingredientesFormateados.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    
-
-
-
-    
 }

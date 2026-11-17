@@ -7,18 +7,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import es.dsw.models.Users;
+import es.dsw.services.UsuariosService;
 
 /**
- * Servicio de autenticación que consulta la base de datos en cada intento de
- * login. A diferencia del InMemoryUserDetailsManager, los usuarios creados o
- * eliminados desde la interfaz surten efecto sin reiniciar la aplicación.
+ * Servicio de autenticación que consulta la BD en cada login a través de la
+ * capa de servicios.
  */
 @Service
 public class DbUserDetailsService implements UserDetailsService {
 
+	private final UsuariosService usuariosService;
+
+	public DbUserDetailsService(UsuariosService usuariosService) {
+		this.usuariosService = usuariosService;
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Users usuario = new Users().getUserByUsername(username);
+		Users usuario = usuariosService.findByUsername(username);
 
 		if (usuario == null) {
 			throw new UsernameNotFoundException("Usuario no encontrado: " + username);

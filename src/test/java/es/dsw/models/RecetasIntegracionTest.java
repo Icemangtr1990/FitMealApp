@@ -1,7 +1,6 @@
 package es.dsw.models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,10 +8,18 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import es.dsw.TestDatabase;
+import es.dsw.app.FitMealAppApplication;
+import es.dsw.services.RecetasService;
 
+@SpringBootTest(classes = FitMealAppApplication.class)
 class RecetasIntegracionTest {
+
+	@Autowired
+	private RecetasService recetasService;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -28,7 +35,7 @@ class RecetasIntegracionTest {
 
 	@Test
 	void agrupaIngredientesRepetidosSumandoCantidades() {
-		List<ItemCompra> items = new Recetas().obtenerListaDeCompras(1, null, null);
+		List<ItemCompra> items = recetasService.listaDeCompras(1, null, null);
 
 		assertEquals(3, items.size(), "Debe agrupar 7 ingredientes en 3 entradas");
 		assertEquals("100 g", buscar(items, "queso parmesano").getCantidadTotal());
@@ -39,7 +46,7 @@ class RecetasIntegracionTest {
 
 	@Test
 	void filtraPorRangoDeFechas() {
-		List<ItemCompra> items = new Recetas().obtenerListaDeCompras(1, "2026-11-10", "2026-11-10");
+		List<ItemCompra> items = recetasService.listaDeCompras(1, "2026-11-10", "2026-11-10");
 
 		assertEquals(2, items.size(), "Solo debe incluir la receta del día 10");
 		assertEquals("50 g", buscar(items, "queso parmesano").getCantidadTotal());
@@ -49,8 +56,7 @@ class RecetasIntegracionTest {
 
 	@Test
 	void devuelveListaVaciaSiNoHayAsignaciones() {
-		List<ItemCompra> items = new Recetas().obtenerListaDeCompras(2, null, null);
-		assertNotNull(items);
+		List<ItemCompra> items = recetasService.listaDeCompras(2, null, null);
 		assertEquals(0, items.size());
 	}
 

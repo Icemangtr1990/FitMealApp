@@ -172,26 +172,33 @@ Los ingredientes se almacenan como JSON:
 src/main/java/es/dsw/
 ├── app/
 │   ├── FitMealAppApplication.java   # Arranque de Spring Boot
-│   ├── SecurityConfiguration.java   # Reglas de seguridad y usuarios en memoria
+│   ├── SecurityConfiguration.java   # Reglas de seguridad y BCrypt
+│   ├── DbUserDetailsService.java    # Login contra la BD
+│   ├── PasswordMigrationService.java# Migración de contraseñas al arrancar
 │   └── ServletInitializer.java      # Arranque en contenedor WAR
-├── connections/
-│   └── MySqlConnection.java         # Capa de conexión JDBC
 ├── controllers/
 │   └── MainController.java          # Controladores MVC (13 rutas)
-└── models/
-    ├── Users.java                   # Usuario + consultas
-    ├── Recetas.java                 # Receta + consultas + parseo JSON
-    └── Planificador.java            # Asignaciones y consultas agregadas
+├── models/                          # Entidades (POJOs, sin JDBC)
+│   ├── Users.java
+│   ├── Recetas.java
+│   ├── Planificador.java
+│   └── ItemCompra.java
+├── repositories/                    # Acceso a datos con JdbcTemplate
+│   ├── UsuariosRepository.java
+│   ├── RecetasRepository.java
+│   └── PlanificadorRepository.java
+└── services/                        # Lógica de negocio
+    ├── UsuariosService.java
+    ├── RecetasService.java
+    └── PlanificadorService.java
 
 src/main/resources/
-├── application.properties
-├── static/
-│   ├── css/                         # estilos propios
-│   └── images/                      # imágenes del carrusel
-└── templates/                       # vistas Thymeleaf (7 plantillas)
+├── application.properties           # DataSource/HikariCP + parámetros BD
+├── static/                          # css e imágenes del carrusel
+└── templates/                       # vistas Thymeleaf (8 plantillas)
 
-src/test/java/                       # test de carga de contexto
-SQL.txt                              # esquema y datos de ejemplo
+src/test/                            # 11 tests JUnit 5 con H2
+SQL.txt                              # esquema, índices y datos de ejemplo
 pom.xml                              # dependencias Maven
 ```
 
@@ -208,6 +215,7 @@ pom.xml                              # dependencias Maven
 - **Autenticación contra BD**: `DbUserDetailsService` consulta MySQL en cada login, así que los usuarios creados o eliminados desde la interfaz surten efecto **sin reiniciar** la aplicación.
 - **Agregación en la compra**: los ingredientes repetidos se agrupan en `ItemCompra`, sumando cantidades cuando comparten unidad y mostrando de qué recetas proceden.
 - **Pruebas automáticas**: 11 tests con JUnit 5 y H2 en memoria que cubren la agrupación/filtrado de la compra, la inserción parametrizada de usuarios, el hash BCrypt y la carga del contexto. Ejecutar con `.\mvnw.cmd test`.
+- **Arquitectura por capas**: entidades POJO → repositorios (`JdbcTemplate`) → servicios → controlador. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot en lugar de `DriverManager`.
 
 ---
 
@@ -215,8 +223,8 @@ pom.xml                              # dependencias Maven
 
 Aspectos que se abordarían en un entorno profesional:
 
-- Separar entidades, repositorios y servicios (o migrar a **Spring Data JPA**).
-- Sustituir `DriverManager` por un **pool de conexiones** (HikariCP, incluido en Spring Boot).
+- Migrar los repositorios `JdbcTemplate` a **Spring Data JPA** con entidades `@Entity`.
+- Añadir paginación en los listados y validación de formularios con Bean Validation.
 
 ---
 
