@@ -29,6 +29,11 @@ public class RecetasService {
 	}
 
 	@Transactional
+	public Recetas findById(int idReceta) {
+		return repository.findById(idReceta);
+	}
+
+	@Transactional
 	public boolean crear(Recetas receta) {
 		return repository.insert(receta);
 	}

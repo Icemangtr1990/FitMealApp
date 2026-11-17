@@ -164,6 +164,18 @@ Los ingredientes se almacenan como JSON:
 | GET | `/admin/listar-usuarios` | Listado de usuarios | Admin |
 | POST | `/admin/eliminar-usuario/{id}` | Eliminar usuario | Admin |
 
+### API REST y documentación
+
+| Método | Ruta | Descripción | Acceso |
+|--------|------|-------------|--------|
+| GET | `/api/recetas` | Listado de recetas (DTOs) | Autenticado |
+| GET | `/api/recetas/{id}` | Receta concreta | Autenticado |
+| POST | `/api/recetas` | Crear receta (JSON) | Admin |
+| GET | `/api/usuarios` | Usuarios (sin contraseña) | Admin |
+| GET | `/api/compras` | Lista de la compra (acepta fechas) | Autenticado |
+
+La documentación OpenAPI está disponible en **`/swagger-ui/index.html`** y el JSON en `/v3/api-docs`. La API usa autenticación Basic y DTOs, así que las entidades nunca se exponen directamente.
+
 ---
 
 ## 📁 Estructura del proyecto
@@ -222,6 +234,7 @@ pom.xml                              # dependencias Maven
 - **Perfiles**: `application-dev.properties` (logs detallados) y `application-prod.properties` (credenciales solo por variables de entorno).
 - **CI**: GitHub Actions ejecuta `./mvnw -B clean verify` en cada push a `master`.
 - **Acceso por roles reforzado**: todo `/admin/**` exige `ROLE_admin` (un test detectó que crear usuarios solo pedía autenticación).
+- **API REST documentada**: controlador `/api` con DTOs (`RecetaDTO`, `UsuarioDTO`, `IngredienteDTO`), validación y **Swagger/OpenAPI**.
 - **Arquitectura por capas**: entidades POJO → repositorios (`JdbcTemplate`) → servicios → controlador. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot en lugar de `DriverManager`.
 - **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
 - **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.

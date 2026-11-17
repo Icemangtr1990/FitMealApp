@@ -24,6 +24,11 @@ public class RecetasRepository {
 				(rs, rowNum) -> map(rs));
 	}
 
+	public Recetas findById(int idReceta) {
+		return jdbc.query("SELECT id_receta, nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario FROM recetas WHERE id_receta = ?",
+				(rs, rowNum) -> map(rs), idReceta).stream().findFirst().orElse(null);
+	}
+
 	public boolean insert(Recetas receta) {
 		return jdbc.update("INSERT INTO recetas (nombre_receta, descripcion, instrucciones, ingredientes, imagen, id_usuario) "
 				+ "VALUES (?, ?, ?, ?, ?, ?)",
