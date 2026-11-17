@@ -1,13 +1,36 @@
 package es.dsw.models;
 
-/** Entidad usuario. El acceso a datos está en UsuariosRepository. */
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/** Entidad usuario. Spring Data JPA se encarga del acceso a datos. */
+@Entity
+@Table(name = "usuarios")
 public class Users {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_usuario")
 	private int idUser;
+
+	@Column(nullable = false, unique = true)
 	private String nombre;
+
+	@Column(name = "password", nullable = false)
 	private String passwd;
-	private String userRole;
+
+	@Column(nullable = false, unique = true)
 	private String email;
+
+	@Column(name = "rol")
+	private String userRole;
+
+	public Users() {
+	}
 
 	public String getNombre() { return nombre; }
 	public void setNombre(String nombre) { this.nombre = nombre; }

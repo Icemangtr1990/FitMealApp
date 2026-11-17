@@ -189,16 +189,24 @@ src/main/java/es/dsw/
 │   ├── PasswordMigrationService.java# Migración de contraseñas al arrancar
 │   └── ServletInitializer.java      # Arranque en contenedor WAR
 ├── controllers/
-│   └── MainController.java          # Controladores MVC (13 rutas)
-├── models/                          # Entidades (POJOs, sin JDBC)
+│   ├── MainController.java          # Controladores MVC (13 rutas)
+│   └── ApiController.java           # API REST (/api)
+├── models/                          # Entidades @Entity + POJOs
 │   ├── Users.java
 │   ├── Recetas.java
 │   ├── Planificador.java
 │   └── ItemCompra.java
-├── repositories/                    # Acceso a datos con JdbcTemplate
+├── dtos/                            # DTOs de la API REST
+│   ├── RecetaDTO.java
+│   ├── UsuarioDTO.java
+│   ├── IngredienteDTO.java
+│   └── RecetaRequest.java
+├── repositories/                    # Spring Data JPA (interfaces + proyecciones nativas)
 │   ├── UsuariosRepository.java
 │   ├── RecetasRepository.java
-│   └── PlanificadorRepository.java
+│   ├── PlanificadorRepository.java
+│   ├── PlanificadorRecetaProjection.java
+│   └── RecetaConUsuariosProjection.java
 └── services/                        # Lógica de negocio
     ├── UsuariosService.java
     ├── RecetasService.java
@@ -235,7 +243,7 @@ pom.xml                              # dependencias Maven
 - **CI**: GitHub Actions ejecuta `./mvnw -B clean verify` en cada push a `master`.
 - **Acceso por roles reforzado**: todo `/admin/**` exige `ROLE_admin` (un test detectó que crear usuarios solo pedía autenticación).
 - **API REST documentada**: controlador `/api` con DTOs (`RecetaDTO`, `UsuarioDTO`, `IngredienteDTO`), validación y **Swagger/OpenAPI**.
-- **Arquitectura por capas**: entidades POJO → repositorios (`JdbcTemplate`) → servicios → controlador. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot en lugar de `DriverManager`.
+- **Arquitectura por capas**: entidades **JPA** (`@Entity`) → repositorios **Spring Data JPA** → servicios → controladores. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot. Las consultas JOIN/agregadas se resuelven con proyecciones nativas tipadas.
 - **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
 - **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.
 - La lista de la compra muestra los ingredientes con la **primera letra en mayúscula**.
@@ -246,8 +254,8 @@ pom.xml                              # dependencias Maven
 
 Aspectos que se abordarían en un entorno profesional:
 
-- Migrar los repositorios `JdbcTemplate` a **Spring Data JPA** con entidades `@Entity`.
 - Añadir paginación en los listados.
+- Sustituir las proyecciones nativas por relaciones JPA completas (`@ManyToOne`) si el modelo crece.
 
 ---
 

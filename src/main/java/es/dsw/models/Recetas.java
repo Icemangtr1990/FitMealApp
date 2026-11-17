@@ -1,23 +1,53 @@
 package es.dsw.models;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** Entidad receta. El acceso a datos está en RecetasRepository. */
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
+/** Entidad receta. Los ingredientes se guardan como JSON en texto. */
+@Entity
+@Table(name = "recetas")
 public class Recetas {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_receta")
 	private int idReceta;
+
+	@Column(name = "nombre_receta", nullable = false)
 	private String nombreReceta;
+
+	@Column(columnDefinition = "TEXT")
 	private String descripcion;
+
+	@Column(columnDefinition = "TEXT")
 	private String instrucciones;
-	private String ingredientes;  // JSON en texto
+
+	@Column(columnDefinition = "TEXT")
+	private String ingredientes;
+
 	private String imagen;
+
+	@Column(name = "id_usuario")
 	private int idUsuario;
+
+	/** Fecha de asignación: no es columna de recetas, se rellena en consultas JOIN. */
+	@Transient
 	private Date fecha;
+
+	public Recetas() {
+	}
 
 	public int getIdReceta() { return idReceta; }
 	public void setIdReceta(int idReceta) { this.idReceta = idReceta; }

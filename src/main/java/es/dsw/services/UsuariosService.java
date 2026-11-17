@@ -32,7 +32,11 @@ public class UsuariosService {
 
 	@Transactional
 	public boolean eliminar(int idUsuario) {
-		return repository.deleteById(idUsuario);
+		if (!repository.existsById(idUsuario)) {
+			return false;
+		}
+		repository.deleteById(idUsuario);
+		return true;
 	}
 
 	@Transactional

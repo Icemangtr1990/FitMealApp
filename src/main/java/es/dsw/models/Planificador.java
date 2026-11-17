@@ -1,23 +1,53 @@
 package es.dsw.models;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Entidad de asignación receta-usuario. El acceso a datos está en PlanificadorRepository. */
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
+/** Entidad de asignación receta-usuario. */
+@Entity
+@Table(name = "planificador")
 public class Planificador {
 
 	private static final Logger log = LoggerFactory.getLogger(Planificador.class);
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_planificador")
 	private int idPlanificador;
+
+	@Column(name = "id_usuario")
 	private int idUsuario;
-	private String fecha;
+
+	@Column(name = "fecha")
+	private LocalDate fecha;
+
+	@Column(name = "id_receta")
 	private int idReceta;
+
+	/** Campos usados solo en vistas (no se persisten). */
+	@Transient
 	private Recetas receta;
+
+	@Transient
 	private Users usuario;
-	private String usuarios;  // Usuarios concatenados por GROUP_CONCAT
+
+	@Transient
+	private String usuarios;
+
+	public Planificador() {
+	}
 
 	public Recetas getReceta() { return receta; }
 	public void setReceta(Recetas receta) { this.receta = receta; }
@@ -31,8 +61,8 @@ public class Planificador {
 	public int getIdUsuario() { return idUsuario; }
 	public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 
-	public String getFecha() { return fecha; }
-	public void setFecha(String fecha) { this.fecha = fecha; }
+	public LocalDate getFecha() { return fecha; }
+	public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 
 	public int getIdReceta() { return idReceta; }
 	public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
