@@ -7,6 +7,11 @@ import org.junit.jupiter.api.Test;
 class ItemCompraTest {
 
 	@Test
+	void primeraLetraEnMayuscula() {
+		assertEquals("Queso parmesano", new ItemCompra("queso parmesano").getIngrediente());
+	}
+
+	@Test
 	void sumaCantidadesConLaMismaUnidad() {
 		ItemCompra item = new ItemCompra("queso parmesano");
 		item.anadir("200g", "Ensalada César");

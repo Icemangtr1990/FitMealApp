@@ -23,7 +23,7 @@ public final class TestDatabase {
 
 			statement.execute("CREATE TABLE usuarios ("
 					+ "id_usuario INT AUTO_INCREMENT PRIMARY KEY, "
-					+ "nombre VARCHAR(100) NOT NULL, "
+					+ "nombre VARCHAR(100) NOT NULL UNIQUE, "
 					+ "email VARCHAR(150) NOT NULL UNIQUE, "
 					+ "password VARCHAR(255) NOT NULL, "
 					+ "rol VARCHAR(20) DEFAULT 'usuario')");

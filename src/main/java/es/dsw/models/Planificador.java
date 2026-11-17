@@ -3,8 +3,13 @@ package es.dsw.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /** Entidad de asignación receta-usuario. El acceso a datos está en PlanificadorRepository. */
 public class Planificador {
+
+	private static final Logger log = LoggerFactory.getLogger(Planificador.class);
 
 	private int idPlanificador;
 	private int idUsuario;
@@ -49,7 +54,7 @@ public class Planificador {
 						user.setNombre(datos[1].trim());
 						listaUsuarios.add(user);
 					} catch (NumberFormatException e) {
-						System.err.println("Error al parsear ID de usuario: " + datos[0]);
+						log.warn("Error al parsear ID de usuario: {}", datos[0]);
 					}
 				}
 			}

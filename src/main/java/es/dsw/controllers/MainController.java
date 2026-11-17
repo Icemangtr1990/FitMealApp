@@ -1,13 +1,16 @@
 package es.dsw.controllers;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +27,15 @@ import es.dsw.services.PlanificadorService;
 import es.dsw.services.RecetasService;
 import es.dsw.services.UsuariosService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
+@Validated
 @SessionAttributes({"DataUser", "usuario", "rol", "idUsuario"})
 public class MainController {
 
@@ -33,6 +43,7 @@ public class MainController {
 	private final RecetasService recetasService;
 	private final PlanificadorService planificadorService;
 	private final PasswordEncoder passwordEncoder;
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	public MainController(UsuariosService usuariosService, RecetasService recetasService,
 			PlanificadorService planificadorService, PasswordEncoder passwordEncoder) {
@@ -96,28 +107,34 @@ public class MainController {
 	}
 
 	@PostMapping("/agregarReceta")
-	public String agregarReceta(@RequestParam("nombre") String nombreReceta,
-			@RequestParam("descripcion") String descripcion,
-			@RequestParam("cantidad") String[] cantidades,
-			@RequestParam("ingrediente") String[] ingredientes,
-			@RequestParam("instrucciones") String instrucciones,
+	public String agregarReceta(@RequestParam("nombre") @NotBlank String nombreReceta,
+			@RequestParam("descripcion") @NotBlank String descripcion,
+			@RequestParam("cantidad") @NotEmpty String[] cantidades,
+			@RequestParam("ingrediente") @NotEmpty String[] ingredientes,
+			@RequestParam("instrucciones") @NotBlank String instrucciones,
 			@RequestParam(value = "imagen", required = false) String imagen) {
 
-		StringBuilder ingredientesJson = new StringBuilder("[");
-		for (int i = 0; i < cantidades.length; i++) {
-			ingredientesJson.append("{\"cantidad\": \"").append(cantidades[i].trim())
-					.append("\", \"ingrediente\": \"").append(ingredientes[i].trim()).append("\"}");
-			if (i < cantidades.length - 1) {
-				ingredientesJson.append(", ");
-			}
+		List<Map<String, String>> listaIngredientes = new ArrayList<>();
+		int total = Math.min(cantidades.length, ingredientes.length);
+		for (int i = 0; i < total; i++) {
+			Map<String, String> ingrediente = new LinkedHashMap<>();
+			ingrediente.put("cantidad", cantidades[i] == null ? "" : cantidades[i].trim());
+			ingrediente.put("ingrediente", ingredientes[i] == null ? "" : ingredientes[i].trim());
+			listaIngredientes.add(ingrediente);
 		}
-		ingredientesJson.append("]");
+
+		String ingredientesJson;
+		try {
+			ingredientesJson = mapper.writeValueAsString(listaIngredientes);
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException("No se pudo serializar los ingredientes", e);
+		}
 
 		Recetas nuevaReceta = new Recetas();
 		nuevaReceta.setNombreReceta(nombreReceta);
 		nuevaReceta.setDescripcion(descripcion);
 		nuevaReceta.setInstrucciones(instrucciones);
-		nuevaReceta.setIngredientes(ingredientesJson.toString());
+		nuevaReceta.setIngredientes(ingredientesJson);
 		nuevaReceta.setImagen(imagen != null && !imagen.trim().isEmpty() ? imagen : null);
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -197,8 +214,10 @@ public class MainController {
 	}
 
 	@PostMapping("/admin/crear-usuario")
-	public String crearUsuario(@RequestParam String nombre, @RequestParam String passwd,
-			@RequestParam String email, @RequestParam String userRole,
+	public String crearUsuario(@RequestParam @NotBlank String nombre,
+			@RequestParam @NotBlank String passwd,
+			@RequestParam @Email @NotBlank String email,
+			@RequestParam @NotBlank String userRole,
 			RedirectAttributes redirectAttributes) {
 
 		Users nuevoUsuario = new Users();

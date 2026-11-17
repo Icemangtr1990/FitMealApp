@@ -19,7 +19,9 @@ public class ItemCompra {
 	private final List<String> recetas = new ArrayList<>();
 
 	public ItemCompra(String ingrediente) {
-		this.ingrediente = ingrediente;
+		String nombre = ingrediente == null ? "" : ingrediente.trim();
+		this.ingrediente = nombre.isEmpty() ? nombre
+				: Character.toUpperCase(nombre.charAt(0)) + nombre.substring(1);
 	}
 
 	public String getIngrediente() {

@@ -2,6 +2,8 @@ package es.dsw.app;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import jakarta.annotation.PostConstruct;
  */
 @Component
 public class PasswordMigrationService {
+
+	private static final Logger log = LoggerFactory.getLogger(PasswordMigrationService.class);
 
 	private final UsuariosService usuariosService;
 	private final PasswordEncoder passwordEncoder;
@@ -41,7 +45,7 @@ public class PasswordMigrationService {
 			}
 		} catch (Exception e) {
 			// En los tests la tabla puede no existir todavía: no es un error fatal.
-			System.err.println("No se pudo comprobar la migración de contraseñas: " + e.getMessage());
+			log.warn("No se pudo comprobar la migración de contraseñas: {}", e.getMessage());
 		}
 	}
 

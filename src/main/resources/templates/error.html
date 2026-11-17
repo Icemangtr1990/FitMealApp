@@ -11,7 +11,9 @@
     <div class="container mt-5">
         <h1 class="display-1">⚠️</h1>
         <h2>Algo ha ido mal</h2>
-        <p class="text-muted">No se ha podido completar la operación. Inténtalo de nuevo.</p>
+        <p class="text-muted" th:text="${mensaje} ?: 'No se ha podido completar la operación. Inténtalo de nuevo.'">
+            No se ha podido completar la operación. Inténtalo de nuevo.
+        </p>
         <a th:href="@{/index}" class="btn btn-primary mt-3">Volver al inicio</a>
     </div>
 </body>

@@ -216,6 +216,9 @@ pom.xml                              # dependencias Maven
 - **Agregación en la compra**: los ingredientes repetidos se agrupan en `ItemCompra`, sumando cantidades cuando comparten unidad y mostrando de qué recetas proceden.
 - **Pruebas automáticas**: 11 tests con JUnit 5 y H2 en memoria que cubren la agrupación/filtrado de la compra, la inserción parametrizada de usuarios, el hash BCrypt y la carga del contexto. Ejecutar con `.\mvnw.cmd test`.
 - **Arquitectura por capas**: entidades POJO → repositorios (`JdbcTemplate`) → servicios → controlador. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot en lugar de `DriverManager`.
+- **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
+- **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.
+- La lista de la compra muestra los ingredientes con la **primera letra en mayúscula**.
 
 ---
 
@@ -224,7 +227,7 @@ pom.xml                              # dependencias Maven
 Aspectos que se abordarían en un entorno profesional:
 
 - Migrar los repositorios `JdbcTemplate` a **Spring Data JPA** con entidades `@Entity`.
-- Añadir paginación en los listados y validación de formularios con Bean Validation.
+- Añadir paginación en los listados.
 
 ---
 
