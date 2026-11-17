@@ -33,6 +33,10 @@ CREATE TABLE Planificador (
     FOREIGN KEY (id_receta) REFERENCES Recetas(id_receta) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Índices para acelerar búsquedas habituales
+CREATE INDEX idx_usuarios_nombre ON Usuarios(nombre);
+CREATE INDEX idx_planificador_usuario_fecha ON Planificador(id_usuario, fecha);
+
 INSERT INTO `recetas_app`.`usuarios` (`nombre`, `email`, `password`, `rol`) VALUES ('admin', 'admin@admin.es', '1234', 'admin');
 
 INSERT INTO `recetas_app`.`usuarios` (`nombre`, `email`, `password`, `rol`) VALUES ('pepe', 'pepe@gmail.com', '1234', 'usuario');

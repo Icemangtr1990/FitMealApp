@@ -43,7 +43,7 @@ public class MainController {
 	}
 
 	@GetMapping(value = {"/", "/index"})
-    public String idx(Model model) {
+    public String idx(Model model, HttpSession session) {
    
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
@@ -63,15 +63,17 @@ public class MainController {
                 if (usuarioEncontrado != null) {
                     idUsuario = usuarioEncontrado.getIdUser();  // Guardamos el ID del usuario
                 }
-            } else {
-                nombreUsuario = principal.toString();
             }
+            // Si el principal no es un UserDetails (usuario anónimo), dejamos
+            // nombreUsuario a null en lugar de mostrar "anonymousUser".
         }
-    
-        // Pasar el usuario, rol y idUsuario al modelo
+
+        // Pasar el usuario, rol y idUsuario al modelo y a la sesión HTTP para
+        // que las demás vistas puedan leerlos de forma consistente.
         model.addAttribute("usuario", nombreUsuario);
         model.addAttribute("rol", rolUsuario);
-        model.addAttribute("idUsuario", idUsuario);  // Añadimos el ID al modelo
+        model.addAttribute("idUsuario", idUsuario);
+        session.setAttribute("idUsuario", idUsuario);
     
         return "index";
     }

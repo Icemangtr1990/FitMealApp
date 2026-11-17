@@ -121,14 +121,14 @@ public List<Planificador> obtenerRecetasPorUsuarios() {
     objMySqlConnection.open();
 
     String sql = "SELECT r.id_receta, r.nombre_receta, r.descripcion, r.ingredientes, r.instrucciones, r.imagen, " +
-                 "GROUP_CONCAT(CONCAT(u.id_usuario, ':', u.nombre) SEPARATOR ', ') AS usuarios " +
+                 "GROUP_CONCAT(CONCAT(u.id_usuario, '|', u.nombre) SEPARATOR ';;') AS usuarios " +
                  "FROM Planificador p " +
                  "JOIN Recetas r ON p.id_receta = r.id_receta " +
                  "JOIN Usuarios u ON p.id_usuario = u.id_usuario " +
                  "GROUP BY r.id_receta;";
 
-    try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql)) {
-        ResultSet rs = stmt.executeQuery();
+    try (PreparedStatement stmt = objMySqlConnection.getConnection().prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
 
         while (rs.next()) {
             Planificador planificador = new Planificador();
@@ -157,14 +157,16 @@ public List<Planificador> obtenerRecetasPorUsuarios() {
 public List<Users> getListaUsuarios() {
     List<Users> listaUsuarios = new ArrayList<>();
     if (usuarios != null && !usuarios.isEmpty()) {
-        String[] usuariosArray = usuarios.split(", ");
+        // Separadores poco probables en un nombre: ';;' entre usuarios y '|'
+        // entre id y nombre (en vez de ',' y ':', que pueden aparecer en nombres).
+        String[] usuariosArray = usuarios.split(";;");
         for (String usuarioData : usuariosArray) {
-            String[] datos = usuarioData.split(":"); // Separar id y nombre
+            String[] datos = usuarioData.split("\\|", 2);
             if (datos.length == 2) {
                 try {
                     Users user = new Users();
-                    user.setIdUser(Integer.parseInt(datos[0].trim())); // id_usuario
-                    user.setNombre(datos[1].trim()); // nombre
+                    user.setIdUser(Integer.parseInt(datos[0].trim()));
+                    user.setNombre(datos[1].trim());
                     listaUsuarios.add(user);
                 } catch (NumberFormatException e) {
                     System.err.println("Error al parsear ID de usuario: " + datos[0]);
