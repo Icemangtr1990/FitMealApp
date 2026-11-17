@@ -35,7 +35,12 @@ public class MySqlConnection {
 	private String puerto = envOrDefault("FITMEAL_DB_PORT", "fitmeal.db.port", "3306");
 	private String nameDB = envOrDefault("FITMEAL_DB_NAME", "fitmeal.db.name", "recetas_app");
 	private String usuario = envOrDefault("FITMEAL_DB_USER", "fitmeal.db.username", "root");
-	private String password = envOrDefault("FITMEAL_DB_PASSWORD", "fitmeal.db.password", "1234");
+	private String password = envOrDefault("FITMEAL_DB_PASSWORD", "fitmeal.db.password", "");
+
+	// Si se indica una URL completa, se usa tal cual (útil para H2 en los tests).
+	// Si no, se construye la URL MySQL con los parámetros anteriores.
+	private String url = envOrDefault("FITMEAL_DB_URL", "fitmeal.db.url", null);
+	private String driver = envOrDefault("FITMEAL_DB_DRIVER", "fitmeal.db.driver", "com.mysql.cj.jdbc.Driver");
 
 	private static Properties loadDbProperties() {
 		Properties props = new Properties();
@@ -146,12 +151,14 @@ public class MySqlConnection {
 			//Si el objeto connection no es vacío o está cerrado se procede a abrirlo.
 			if ((this.connection == null) || ((this.connection != null) && (this.connection.isClosed())))
 			{
-			  //Se carga el jdbc
-			  Class.forName("com.mysql.cj.jdbc.Driver");
-			  //Se indican los datos de conexión y se intenta obtener el objeto abierto (esta instrucción es crítica)
-			  this.connection = DriverManager.getConnection(
-			      "jdbc:mysql://"+this.host+":"+this.puerto+"/"+this.nameDB
-			      + "?useUnicode=true&characterEncoding=utf8", this.usuario, this.password);
+			  //Se carga el driver configurado
+			  Class.forName(this.driver);
+			  //URL explícita (tests con H2) o URL MySQL construida a partir de las propiedades
+			  String jdbcUrl = (this.url != null && !this.url.isBlank())
+			      ? this.url
+			      : "jdbc:mysql://"+this.host+":"+this.puerto+"/"+this.nameDB
+			        + "?useUnicode=true&characterEncoding=utf8";
+			  this.connection = DriverManager.getConnection(jdbcUrl, this.usuario, this.password);
 			  //Se indica si se realizará autocomit (cada operación será independiente) o si se estará en modo de transacción (delega en la capa de datos el commit).
 			  this.connection.setAutoCommit(this.autocomit);
 			  System.out.println("Open conexion");

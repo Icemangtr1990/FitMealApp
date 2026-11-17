@@ -31,6 +31,7 @@ Incluye autenticación con dos roles (`usuario` y `admin`), gestión de recetas,
 | Build | Maven (wrapper incluido) |
 | Despliegue | WAR para Apache Tomcat 10.1+ (Jakarta EE) |
 | Monitoreo | Spring Boot Actuator |
+| Tests | JUnit 5 + H2 (base de datos en memoria) |
 
 ---
 
@@ -206,6 +207,7 @@ pom.xml                              # dependencias Maven
 - **Seguridad**: contraseñas con **BCrypt** (con migración automática de las del `SQL.txt`), configuración de BD externalizable, **PreparedStatement** en todas las consultas y mutaciones por **POST** con token CSRF de Thymeleaf.
 - **Autenticación contra BD**: `DbUserDetailsService` consulta MySQL en cada login, así que los usuarios creados o eliminados desde la interfaz surten efecto **sin reiniciar** la aplicación.
 - **Agregación en la compra**: los ingredientes repetidos se agrupan en `ItemCompra`, sumando cantidades cuando comparten unidad y mostrando de qué recetas proceden.
+- **Pruebas automáticas**: 11 tests con JUnit 5 y H2 en memoria que cubren la agrupación/filtrado de la compra, la inserción parametrizada de usuarios, el hash BCrypt y la carga del contexto. Ejecutar con `.\mvnw.cmd test`.
 
 ---
 
@@ -215,7 +217,6 @@ Aspectos que se abordarían en un entorno profesional:
 
 - Separar entidades, repositorios y servicios (o migrar a **Spring Data JPA**).
 - Sustituir `DriverManager` por un **pool de conexiones** (HikariCP, incluido en Spring Boot).
-- Añadir **tests de integración** con H2 para las capas de datos y controladores.
 
 ---
 

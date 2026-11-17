@@ -44,7 +44,7 @@ public class Users {
    
 
     public ArrayList<Users> getUser() {
-        String sql = "SELECT id_usuario AS ID, nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios";
+        String sql = "SELECT id_usuario AS ID, nombre AS NOMBRE, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM usuarios";
         
         ArrayList<Users> objListaUsuarios = new ArrayList<>();
         objMySqlConnection.open();
@@ -81,7 +81,7 @@ public class Users {
 
     public Users getUserByUsername(String username) {
     // Usamos una consulta parametrizada para obtener un solo usuario por su nombre de usuario
-    String sql = "SELECT id_usuario, nombre, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM recetas_app.usuarios WHERE nombre = ?";
+    String sql = "SELECT id_usuario, nombre, password AS CONTRASEÑA, email AS EMAIL, rol AS ROL FROM usuarios WHERE nombre = ?";
     
     Users objUsuario = null;
     objMySqlConnection.open();
