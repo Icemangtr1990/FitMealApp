@@ -121,7 +121,8 @@ public class MainController {
 			@RequestParam("cantidad") @NotEmpty String[] cantidades,
 			@RequestParam("ingrediente") @NotEmpty String[] ingredientes,
 			@RequestParam("instrucciones") @NotBlank String instrucciones,
-			@RequestParam(value = "imagen", required = false) String imagen) {
+			@RequestParam(value = "imagen", required = false) String imagen,
+			RedirectAttributes redirectAttributes) {
 
 		List<Map<String, String>> listaIngredientes = new ArrayList<>();
 		int total = Math.min(cantidades.length, ingredientes.length);
@@ -151,28 +152,37 @@ public class MainController {
 				? ((UserDetails) auth.getPrincipal()).getUsername() : null;
 		Users autor = nombreUsuario != null ? usuariosService.findByUsername(nombreUsuario) : null;
 		if (autor == null) {
+			redirectAttributes.addFlashAttribute("error", "No se pudo identificar al usuario.");
 			return "redirect:/recetas";
 		}
 		nuevaReceta.setIdUsuario(autor.getIdUser());
 
-		return recetasService.crear(nuevaReceta) ? "redirect:/recetas" : "error";
+		if (recetasService.crear(nuevaReceta)) {
+			redirectAttributes.addFlashAttribute("mensaje", "Receta creada correctamente.");
+			return "redirect:/recetas";
+		}
+		redirectAttributes.addFlashAttribute("error", "No se pudo crear la receta.");
+		return "redirect:/recetas";
 	}
 
 	@PostMapping("/admin/eliminar-receta")
-	public String eliminarReceta(@RequestParam("idReceta") int idReceta) {
+	public String eliminarReceta(@RequestParam("idReceta") int idReceta, RedirectAttributes redirectAttributes) {
 		recetasService.eliminar(idReceta);
+		redirectAttributes.addFlashAttribute("mensaje", "Receta eliminada correctamente.");
 		return "redirect:/recetas";
 	}
 
 	@PostMapping("/asignarReceta")
 	public String asignarReceta(@RequestParam("idReceta") int idReceta,
 			@RequestParam("idUsuario") int idUsuario,
-			@RequestParam("fecha") String fecha, Model model) {
+			@RequestParam("fecha") String fecha, RedirectAttributes redirectAttributes) {
 
-		model.addAttribute("usuarios", usuariosService.findAll());
-		model.addAttribute("listaRecetas", recetasService.findAll());
-
-		return recetasService.asignar(idReceta, idUsuario, fecha) ? "redirect:/recetas" : "error";
+		if (recetasService.asignar(idReceta, idUsuario, fecha)) {
+			redirectAttributes.addFlashAttribute("mensaje", "Receta asignada correctamente.");
+		} else {
+			redirectAttributes.addFlashAttribute("error", "No se pudo asignar la receta.");
+		}
+		return "redirect:/recetas";
 	}
 
 	@PostMapping("/eliminarAsignacion")

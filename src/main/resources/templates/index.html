@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/layout :: head('Inicio - FitMealApp')}"></head>
 <body class="d-flex flex-column">
 
@@ -12,10 +13,8 @@
         <h1 class="mt-3">Planifica tus comidas. Disfruta el resto.</h1>
         <p class="mb-4">Encuentra recetas, organiza tu semana y genera tu lista de la compra automáticamente. Todo en un mismo sitio.</p>
         <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-lg" th:href="@{/recetas}">Explorar recetas →</a>
-            <a class="btn btn-lg btn-outline-light" 
-               style="border-color:rgba(255,255,255,.6);color:#fff;background:transparent;"
-               th:href="@{/loggin}">Entrar</a>
+            <a sec:authorize="isAuthenticated()" class="btn btn-lg" th:href="@{/recetas}">Explorar recetas →</a>
+            <a sec:authorize="isAnonymous()" class="btn btn-lg" th:href="@{/loggin}">Explorar recetas →</a>
         </div>
     </section>
 

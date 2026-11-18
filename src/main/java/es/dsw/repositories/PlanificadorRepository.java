@@ -14,7 +14,7 @@ public interface PlanificadorRepository extends JpaRepository<Planificador, Inte
 	@Query(value = "SELECT r.id_receta AS idReceta, r.nombre_receta AS nombreReceta, "
 			+ "r.descripcion AS descripcion, r.ingredientes AS ingredientes, "
 			+ "r.instrucciones AS instrucciones, r.imagen AS imagen, "
-			+ "GROUP_CONCAT(CONCAT(u.id_usuario, '|', u.nombre) SEPARATOR ';;') AS usuarios "
+			+ "GROUP_CONCAT(DISTINCT CONCAT(u.id_usuario, '|', u.nombre) SEPARATOR ';;') AS usuarios "
 			+ "FROM planificador p "
 			+ "JOIN recetas r ON p.id_receta = r.id_receta "
 			+ "JOIN usuarios u ON p.id_usuario = u.id_usuario "

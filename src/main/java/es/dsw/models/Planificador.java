@@ -73,16 +73,21 @@ public class Planificador {
 	/** Convierte la cadena GROUP_CONCAT en una lista de usuarios. */
 	public List<Users> getListaUsuarios() {
 		List<Users> listaUsuarios = new ArrayList<>();
+		List<Integer> idsVistos = new ArrayList<>();
 		if (usuarios != null && !usuarios.isEmpty()) {
 			String[] usuariosArray = usuarios.split(";;");
 			for (String usuarioData : usuariosArray) {
 				String[] datos = usuarioData.split("\\|", 2);
 				if (datos.length == 2) {
 					try {
-						Users user = new Users();
-						user.setIdUser(Integer.parseInt(datos[0].trim()));
-						user.setNombre(datos[1].trim());
-						listaUsuarios.add(user);
+						int id = Integer.parseInt(datos[0].trim());
+						if (!idsVistos.contains(id)) {
+							idsVistos.add(id);
+							Users user = new Users();
+							user.setIdUser(id);
+							user.setNombre(datos[1].trim());
+							listaUsuarios.add(user);
+						}
 					} catch (NumberFormatException e) {
 						log.warn("Error al parsear ID de usuario: {}", datos[0]);
 					}

@@ -63,6 +63,16 @@ class WebSecurityTest {
 	}
 
 	@Test
+	void usuarioNormalNoPuedeAsignarRecetas() throws Exception {
+		MockHttpSession session = login("pepe");
+		mockMvc.perform(post("/asignarReceta").session(session).with(csrf())
+				.param("idReceta", "1")
+				.param("idUsuario", "2")
+				.param("fecha", "2026-11-20"))
+				.andExpect(status().isForbidden());
+	}
+
+	@Test
 	void usuarioNormalNoPuedeCrearUsuarios() throws Exception {
 		MockHttpSession session = login("pepe");
 		mockMvc.perform(post("/admin/crear-usuario").session(session).with(csrf())

@@ -248,7 +248,7 @@ pom.xml                              # dependencias Maven
 - **Transacciones**: los servicios de escritura usan `@Transactional`.
 - **Perfiles**: `application-dev.properties` (logs detallados) y `application-prod.properties` (credenciales solo por variables de entorno).
 - **CI**: GitHub Actions ejecuta `./mvnw -B clean verify` en cada push a `master`.
-- **Acceso por roles reforzado**: todo `/admin/**` exige `ROLE_admin` (un test detectó que crear usuarios solo pedía autenticación).
+- **Acceso por roles reforzado**: `/admin/**`, `/agregarReceta`, `/asignarReceta` y `/eliminarAsignacion` exigen `ROLE_admin`; las vistas ocultan esas acciones a los usuarios normales (un test lo verifica).
 - **API REST documentada**: controlador `/api` con DTOs (`RecetaDTO`, `UsuarioDTO`, `IngredienteDTO`), validación y **Swagger/OpenAPI**.
 - **Errores de API en JSON**: `@RestControllerAdvice` propio devuelve `ApiError` con códigos 400/404/409/500 (JSON malformado, validación, duplicados…), separado del manejo HTML de las vistas MVC.
 - **Paginación**: `/recetas` y `/api/recetas?page=&size=&sort=` devuelven páginas (`PaginaDTO` en la API).

@@ -26,6 +26,7 @@ public class SecurityConfiguration {
 							  .requestMatchers("/admin/**").hasRole("admin")
 							  .requestMatchers("/agregarReceta/**").hasRole("admin")
 							  .requestMatchers("/crearUsuario/**").hasRole("admin")
+							  .requestMatchers("/asignarReceta", "/eliminarAsignacion").hasRole("admin")
 					    			  .requestMatchers("/index/**").permitAll()
 							  .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 							  .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("admin")

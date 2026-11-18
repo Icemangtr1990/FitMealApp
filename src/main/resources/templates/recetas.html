@@ -48,7 +48,12 @@
                 <li th:each="planificador : ${recetasAsignadas}">
                     <div>
                         <div class="item-name" th:text="${planificador.receta.nombreReceta}">Receta</div>
-                        <div class="item-meta" th:text="'Usuarios: ' + ${planificador.listaUsuarios}">Usuarios</div>
+                        <div class="item-meta">
+                            Usuarios:
+                            <span th:each="usuarioAsignado, iter : ${planificador.listaUsuarios}">
+                                <span th:text="${usuarioAsignado.nombre}">nombre</span><span th:if="${!iter.last}">, </span>
+                            </span>
+                        </div>
                     </div>
                     <div class="d-flex flex-wrap gap-2">
                         <form th:each="usuarioAsignado : ${planificador.listaUsuarios}"
@@ -87,20 +92,22 @@
                     <p class="mb-3"><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}"></span></p>
 
                     <div class="d-flex flex-wrap gap-2 align-items-end">
-                        <form th:action="@{/asignarReceta}" method="post" class="d-flex flex-wrap gap-2 align-items-end flex-grow-1">
-                            <input type="hidden" name="idReceta" th:value="${receta.idReceta}">
-                            <div>
-                                <label class="form-label small mb-0" th:for="'usuario-' + ${receta.idReceta}">Usuario</label>
-                                <select class="form-select form-select-sm" th:id="'usuario-' + ${receta.idReceta}" name="idUsuario" required>
-                                    <option th:each="usuario : ${usuarios}" th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label small mb-0" th:for="'fecha-' + ${receta.idReceta}">Fecha</label>
-                                <input type="date" class="form-control form-control-sm" th:id="'fecha-' + ${receta.idReceta}" name="fecha" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-sm">Asignar</button>
-                        </form>
+                        <div sec:authorize="hasRole('admin')" class="d-flex flex-wrap gap-2 align-items-end flex-grow-1">
+                            <form th:action="@{/asignarReceta}" method="post" class="d-flex flex-wrap gap-2 align-items-end flex-grow-1">
+                                <input type="hidden" name="idReceta" th:value="${receta.idReceta}">
+                                <div>
+                                    <label class="form-label small mb-0" th:for="'usuario-' + ${receta.idReceta}">Usuario</label>
+                                    <select class="form-select form-select-sm" th:id="'usuario-' + ${receta.idReceta}" name="idUsuario" required>
+                                        <option th:each="usuario : ${usuarios}" th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label small mb-0" th:for="'fecha-' + ${receta.idReceta}">Fecha</label>
+                                    <input type="date" class="form-control form-control-sm" th:id="'fecha-' + ${receta.idReceta}" name="fecha" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm">Asignar</button>
+                            </form>
+                        </div>
                         <form sec:authorize="hasRole('admin')" th:action="@{/admin/eliminar-receta}" method="post"
                               data-confirm="¿Eliminar esta receta?">
                             <input type="hidden" name="idReceta" th:value="${receta.idReceta}">
