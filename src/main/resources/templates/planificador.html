@@ -1,81 +1,44 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificador Semanal - FitMealApp</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/styles.css"> <!-- Enlace al archivo CSS -->
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">FitMealApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <div sec:authorize="isAuthenticated()">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" th:href="@{/recetas}">Recetas</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/planificador}">Planificador</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
-                    </ul>
-                </div>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Planificador - FitMealApp')}"></head>
+<body class="d-flex flex-column">
 
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/crearUsuario}">
-                        <button class="btn btn-primary">Crear Usuario</button>
-                    </a>
-                </div>
-            
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/admin/listar-usuarios}">
-                        <button class="btn btn-primary">Ver Usuarios</button>
-                    </a>
-                </div>
-                <div class="ms-auto d-flex">
-                    
-                    <div sec:authorize="isAuthenticated()">
-                        <form th:action="@{/logout}" method="POST" class="d-inline">
-                            <button class="btn btn-danger">Cerrar sesión</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+<div th:replace="~{fragments/layout :: navbar('planificador')}"></div>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <header class="page-heading d-flex flex-wrap justify-content-between align-items-end gap-2">
+        <div>
+            <h1>🗓️ Mi planificador</h1>
+            <p>Las recetas que tienes asignadas, con su fecha.</p>
         </div>
-    </nav>
+        <a class="btn btn-soft" th:href="@{/compras}">Ver lista de la compra →</a>
+    </header>
 
-    <!-- Contenido Principal -->
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Planificador Semanal</h1>
-
-        <h2 class="text-center mb-4">Tus Recetas Asignadas</h2>
-
-        <div th:each="receta : ${recetasAsignadas}" class="mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title" th:text="${receta.nombreReceta}">Nombre de la receta</h3>
-                    <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}"></span></p>
-                    <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}"></span></p>
-                    <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}" class="text-wrap"></span></p>
-                    <p><strong>Fecha:</strong> <span th:text="${receta.fechaFormateada}"></span></p>
-                </div>
-            </div>
-        </div>
-
-        <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
+    <div th:if="${#lists.isEmpty(recetasAsignadas)}" class="empty-state">
+        <div class="emoji">📅</div>
+        <h3>Tu semana está libre</h3>
+        <p>Pide a un administrador que te asigne una receta desde el listado de recetas.</p>
+        <a class="btn btn-primary mt-3" th:href="@{/recetas}">Ver recetas</a>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-light text-center py-3 mt-5">
-        <div class="container">
-            <span class="text-muted">© 2025 FitMealApp. Todos los derechos reservados.</span>
-        </div>
-    </footer>
+    <div class="row g-3" th:unless="${#lists.isEmpty(recetasAsignadas)}">
+        <article class="col-lg-6" th:each="receta : ${recetasAsignadas}">
+            <div class="app-card h-100">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <h2 class="h5 mb-0" th:text="${receta.nombreReceta}">Receta</h2>
+                    <span class="app-badge" th:text="${receta.fechaFormateada}">00/00/0000</span>
+                </div>
+                <p class="text-muted mb-2" th:text="${receta.descripcion}">Descripción</p>
+                <p class="mb-1"><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}"></span></p>
+                <p class="mb-3"><strong>Preparación:</strong> <span th:text="${receta.instrucciones}"></span></p>
+                <span class="item-meta">Asignada a ti</span>
+            </div>
+        </article>
+    </div>
+</main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

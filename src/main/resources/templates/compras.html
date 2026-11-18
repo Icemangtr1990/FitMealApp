@@ -1,108 +1,62 @@
-
-
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compras - FitMealApp</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/styles.css"> <!-- Enlace al archivo CSS -->
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">FitMealApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <div sec:authorize="isAuthenticated()">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" th:href="@{/recetas}">Recetas</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/planificador}">Planificador</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
-                    </ul>
-                </div>
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/crearUsuario}">
-                        <button class="btn btn-primary">Crear Usuario</button>
-                    </a>
-                </div>
-            
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/admin/listar-usuarios}">
-                        <button class="btn btn-primary">Ver Usuarios</button>
-                    </a>
-                </div>
-                <div class="ms-auto d-flex">
-                    
-                    <div sec:authorize="isAuthenticated()">
-                        <form th:action="@{/logout}" method="POST" class="d-inline">
-                            <button class="btn btn-danger">Cerrar sesión</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Lista de la compra - FitMealApp')}"></head>
+<body class="d-flex flex-column">
+
+<div th:replace="~{fragments/layout :: navbar('compras')}"></div>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <header class="page-heading">
+        <h1>🛒 Lista de la compra</h1>
+        <p>Ingredientes agrupados de tus recetas planificadas. Marca lo que ya tengas.</p>
+    </header>
+
+    <form method="get" th:action="@{/compras}" class="form-filter row g-2 align-items-end mb-4 no-print">
+        <div class="col-sm-4 col-md-3">
+            <label for="fechaDesde" class="form-label mb-0">Desde</label>
+            <input type="date" class="form-control" id="fechaDesde" name="fechaDesde" th:value="${fechaDesde}">
         </div>
-    </nav>
-
-    <!-- Contenido Principal -->
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Lista de la compra</h1>
-
-        <form method="get" th:action="@{/compras}" class="row g-2 align-items-end justify-content-center mb-4">
-            <div class="col-auto">
-                <label for="fechaDesde" class="form-label mb-0">Desde</label>
-                <input type="date" class="form-control" id="fechaDesde" name="fechaDesde"
-                       th:value="${fechaDesde}">
-            </div>
-            <div class="col-auto">
-                <label for="fechaHasta" class="form-label mb-0">Hasta</label>
-                <input type="date" class="form-control" id="fechaHasta" name="fechaHasta"
-                       th:value="${fechaHasta}">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
-            </div>
-            <div class="col-auto">
-                <a th:href="@{/compras}" class="btn btn-outline-secondary">Ver todas</a>
-            </div>
-        </form>
-
-        <div th:if="${#lists.isEmpty(listaCompras)}" class="alert alert-info text-center">
-            No hay ingredientes para las fechas seleccionadas.
+        <div class="col-sm-4 col-md-3">
+            <label for="fechaHasta" class="form-label mb-0">Hasta</label>
+            <input type="date" class="form-control" id="fechaHasta" name="fechaHasta" th:value="${fechaHasta}">
         </div>
-
-        <div th:unless="${#lists.isEmpty(listaCompras)}" class="card">
-            <div class="card-body">
-                <h2 class="h5 card-title mb-3">Ingredientes agrupados</h2>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center"
-                        th:each="item : ${listaCompras}">
-                        <span th:text="${item.ingrediente}">Ingrediente</span>
-                        <span class="text-end">
-                            <strong th:text="${item.cantidadTotal}">Cantidad</strong>
-                            <small class="text-muted d-block" th:text="'Recetas: ' + ${item.recetasTexto}"></small>
-                        </span>
-                    </li>
-                </ul>
-            </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
         </div>
+        <div class="col-auto">
+            <a th:href="@{/compras}" class="btn btn-secondary">Ver todas</a>
+        </div>
+    </form>
 
-        <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
+    <div th:if="${#lists.isEmpty(listaCompras)}" class="empty-state">
+        <div class="emoji">🧺</div>
+        <h3>Nada en la cesta</h3>
+        <p>No hay ingredientes para las fechas seleccionadas. Prueba con otro rango o asigna recetas en el planificador.</p>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-light text-center py-3 mt-5">
-        <div class="container">
-            <span class="text-muted">© 2026 FitMealApp. Todos los derechos reservados.</span>
+    <section th:unless="${#lists.isEmpty(listaCompras)}" class="app-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div class="section-title mb-0"><span class="emoji">🥬</span><h2 class="h4 mb-0">Ingredientes agrupados</h2></div>
+            <button type="button" class="btn btn-soft btn-sm no-print" onclick="window.print()">🖨️ Imprimir lista</button>
         </div>
-    </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <ul class="app-list">
+            <li th:each="item : ${listaCompras}">
+                <label class="d-flex align-items-center gap-3 mb-0 flex-grow-1" th:for="'item-' + ${itemStat.index}">
+                    <input type="checkbox" class="qty-check no-print" th:id="'item-' + ${itemStat.index}">
+                    <span>
+                        <span class="item-name" th:text="${item.ingrediente}">Ingrediente</span>
+                        <span class="item-meta d-block" th:text="'Recetas: ' + ${item.recetasTexto}">Recetas</span>
+                    </span>
+                </label>
+                <span class="item-qty" th:text="${item.cantidadTotal}">Cantidad</span>
+            </li>
+        </ul>
+    </section>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
-

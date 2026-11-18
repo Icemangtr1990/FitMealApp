@@ -1,22 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autenticación-FitMealApp</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
-<body> 
-  
-        <form class="F1" method="post" th:action="@{/logginprocess}">
-           <div><p style="font-size: 40px;color:rgb(10, 0, 0);">Autenticación FitMealApp</p></div>
-           <div><label>Usuario: </label><input type="text" name="username" autocomplete="off" /></div>
-           <div><label>Password: </label><input type="password" name="password" /></div>
-           <div><input type="submit" value="Entrar"/></div>
-           <div><p style="font-size: 16px; color: red;" th:if="${param.logout}">Sesión de usuario finalizada.</p>
-                <p style="font-size: 16px; color: red;" th:if="${param.error}">Usuario y contraseña incorrectos.</p>
-           </div>
-        </form>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Iniciar sesión - FitMealApp')}"></head>
+<body class="d-flex flex-column">
+
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-head">
+            <div style="font-size: 2.6rem;">🥗</div>
+            <h1>FitMealApp</h1>
+            <p class="mb-0" style="opacity:.85;">Tu semana, más fácil</p>
+        </div>
+        <div class="login-body">
+            <div th:if="${param.logout}" class="app-alert app-alert-ok">Sesión cerrada correctamente.</div>
+            <div th:if="${param.error}" class="app-alert app-alert-error">Usuario o contraseña incorrectos.</div>
+
+            <form method="post" th:action="@{/logginprocess}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Usuario</label>
+                    <input type="text" id="username" name="username" class="form-control"
+                           autocomplete="username" placeholder="Tu usuario" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           autocomplete="current-password" placeholder="Tu contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Entrar →</button>
+            </form>
+
+            <p class="text-center text-muted mt-4 mb-0" style="font-size:.9rem;">
+                ¿No tienes cuenta? Pide acceso al administrador.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

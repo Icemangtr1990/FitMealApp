@@ -1,187 +1,145 @@
-
-
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recetas - FitMealApp</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">FitMealApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <div sec:authorize="isAuthenticated()">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" th:href="@{/recetas}">Recetas</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/planificador}">Planificador</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/compras}">Lista de Compras</a></li>
-                    </ul>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Recetas - FitMealApp')}"></head>
+<body class="d-flex flex-column">
+
+<div th:replace="~{fragments/layout :: navbar('recetas')}"></div>
+<div th:replace="~{fragments/layout :: flash}"></div>
+
+<main class="container py-4">
+    <header class="page-heading">
+        <h1>📖 Recetas</h1>
+        <p>Tu colección de platos. Asígnalos a un día o crea nuevos si eres administrador.</p>
+    </header>
+
+    <!-- Alta de receta (solo admin) -->
+    <section sec:authorize="hasRole('admin')" class="app-card mb-4">
+        <div class="section-title"><span class="emoji">➕</span><h2 class="h4 mb-0">Nueva receta</h2></div>
+        <form th:action="@{/agregarReceta}" method="post">
+            <div class="row g-3">
+                <div class="col-md-6"><label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej. Ensalada César" required></div>
+                <div class="col-md-6"><label for="imagen" class="form-label">Imagen (URL)</label>
+                    <input type="text" id="imagen" name="imagen" class="form-control" placeholder="Opcional"></div>
+                <div class="col-12"><label for="descripcion" class="form-label">Descripción</label>
+                    <input type="text" id="descripcion" name="descripcion" class="form-control" required></div>
+                <div class="col-12"><label class="form-label">Ingredientes</label>
+                    <div id="ingredientes-container">
+                        <div class="row g-2 mb-2 ingrediente">
+                            <div class="col-4"><input type="text" name="cantidad[]" class="form-control" placeholder="Cantidad" required></div>
+                            <div class="col-8"><input type="text" name="ingrediente[]" class="form-control" placeholder="Ingrediente" required></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-soft btn-sm" onclick="agregarIngrediente()">＋ Añadir ingrediente</button>
                 </div>
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/crearUsuario}">
-                        <button class="btn btn-primary">Crear Usuario</button>
-                    </a>
-                </div>
-            
-                <div sec:authorize="hasRole('admin')">
-                    <a th:href="@{/admin/listar-usuarios}">
-                        <button class="btn btn-primary">Ver Usuarios</button>
-                    </a>
-                </div>
-                <div class="ms-auto d-flex">
-                    
-                    <div sec:authorize="isAuthenticated()">
-                        <form th:action="@{/logout}" method="POST" class="d-inline">
-                            <button class="btn btn-danger">Cerrar sesión</button>
+                <div class="col-12"><label for="instrucciones" class="form-label">Instrucciones</label>
+                    <textarea id="instrucciones" name="instrucciones" class="form-control" rows="3" required></textarea></div>
+                <div class="col-12"><button type="submit" class="btn btn-primary">Guardar receta</button></div>
+            </div>
+        </form>
+    </section>
+
+    <!-- Asignaciones (solo admin) -->
+    <section sec:authorize="hasRole('admin')" class="mb-4" th:if="${not #lists.isEmpty(recetasAsignadas)}">
+        <div class="section-title"><span class="emoji">🗓️</span><h2 class="h4 mb-0">Asignaciones</h2></div>
+        <div class="app-card">
+            <ul class="app-list">
+                <li th:each="planificador : ${recetasAsignadas}">
+                    <div>
+                        <div class="item-name" th:text="${planificador.receta.nombreReceta}">Receta</div>
+                        <div class="item-meta" th:text="'Usuarios: ' + ${planificador.listaUsuarios}">Usuarios</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <form th:each="usuarioAsignado : ${planificador.listaUsuarios}"
+                              th:action="@{/eliminarAsignacion}" method="post"
+                              data-confirm="¿Quitar esta asignación?">
+                            <input type="hidden" name="idUsuario" th:value="${usuarioAsignado.idUser}">
+                            <input type="hidden" name="idReceta" th:value="${planificador.receta.idReceta}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    th:text="'Quitar ' + ${usuarioAsignado.nombre}">Quitar</button>
                         </form>
                     </div>
-                </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    
-    <div class="container mt-5">
-        <h1 class="text-center">Bienvenido <span th:text="${usuario}">Usuario</span></h1>
-        
-        
-        <div sec:authorize="hasRole('admin')" class="mt-4">
-            <h2>Agregar Receta</h2>
-            <form th:action="@{/agregarReceta}" method="post" class="form-group">
-                <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre de la receta" required>
-                <input type="text" name="descripcion" class="form-control mb-2" placeholder="Descripción" required>
-
-               
-                <div id="ingredientes-container">
-                    <div class="ingrediente mb-2">
-                        <input type="text" name="cantidad[]" class="form-control" placeholder="Cantidad" required>
-                        <input type="text" name="ingrediente[]" class="form-control" placeholder="Ingrediente" required>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary mb-2" onclick="agregarIngrediente()">Agregar Ingrediente</button>
-                
-                <textarea name="instrucciones" class="form-control mb-2" placeholder="Instrucciones" required></textarea>
-                <input type="text" name="imagen" class="form-control mb-2" placeholder="URL de la imagen">
-                <button type="submit" class="btn btn-primary">Agregar Receta</button>
-            </form>
-        </div>
-
-        <script>
-            function agregarIngrediente() {
-                const container = document.getElementById('ingredientes-container');
-                const nuevoIngrediente = document.createElement('div');
-                nuevoIngrediente.classList.add('ingrediente', 'mb-2');
-                nuevoIngrediente.innerHTML = `
-                    <input type="text" name="cantidad[]" class="form-control mb-2" placeholder="Cantidad" required>
-                    <input type="text" name="ingrediente[]" class="form-control mb-2" placeholder="Ingrediente" required>
-                `;
-                container.appendChild(nuevoIngrediente);
-            }
-        </script>
-
-       
-        <div sec:authorize="hasRole('admin')" class="mt-4">
-            <h2>Recetas Asignadas</h2>
-            <div th:each="planificador : ${recetasAsignadas}">
-                <div class="mb-4">
-                    <h3><strong>Receta:</strong> <span th:text="${planificador.receta.nombreReceta}"></span></h3>
-                    <p><strong>Usuarios Asignados:</strong></p>
-                    <ul>
-                        <th:block th:each="usuario : ${planificador.listaUsuarios}">
-                            <li>
-                                <span th:text="${usuario.nombre}"></span>
-                                <form th:action="@{/eliminarAsignacion}" method="post" style="display:inline;">
-                                    <input type="hidden" name="idUsuario" th:value="${usuario.idUser}" />
-                                    <input type="hidden" name="idReceta" th:value="${planificador.receta.idReceta}" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                </form>
-                            </li>
-                        </th:block>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        
-        <div>
-            <h2>Listado de Recetas</h2>
-            <ul class="list-group">
-                <th:block th:each="receta : ${listaRecetas}">
-                    <li class="list-group-item mb-3">
-                        <h3 th:text="${receta.nombreReceta}">Nombre de la receta</h3>
-                        <p><strong>Descripción:</strong> <span th:text="${receta.descripcion}">Descripción aquí</span></p>
-                        <p><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}">Ingredientes aquí</span></p>
-                        <p><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}">Instrucciones aquí</span></p>
-
-                        <div sec:authorize="hasRole('admin')">
-                            <form th:action="@{/asignarReceta}" method="post">
-                                <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                        
-                                <label for="idUsuario">Usuario:</label>
-                                <select name="idUsuario" required>
-                                    <th:block th:each="usuario : ${usuarios}">
-                                        <option th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
-                                    </th:block>
-                                </select>
-                        
-                                <label for="fecha">Fecha:</label>
-                                <input type="date" name="fecha" required />
-                        
-                                <button type="submit" class="btn btn-primary">Asignar Receta</button>
-                            </form>
-                        </div>
-
-                        <div sec:authorize="hasRole('admin')">
-                            <form th:action="@{/admin/eliminar-receta}" method="post">
-                                <input type="hidden" name="idReceta" th:value="${receta.idReceta}" />
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar Receta</button>
-                            </form>
-                        </div>
-                    </li>
-                </th:block>
+                </li>
             </ul>
+        </div>
+    </section>
 
-            <nav th:if="${totalPaginas > 1}" class="mt-4" aria-label="Paginación">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/recetas(pagina=${paginaActual - 1})}">Anterior</a>
-                    </li>
-                    <li class="page-item"
-                        th:each="numero : ${#numbers.sequence(0, totalPaginas - 1)}"
-                        th:classappend="${numero == paginaActual} ? 'active'">
-                        <a class="page-link" th:href="@{/recetas(pagina=${numero})}"
-                           th:text="${numero + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${paginaActual >= totalPaginas - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/recetas(pagina=${paginaActual + 1})}">Siguiente</a>
-                    </li>
-                </ul>
-            </nav>
+    <!-- Listado de recetas -->
+    <section>
+        <div class="section-title"><span class="emoji">🥘</span><h2 class="h4 mb-0">Todas las recetas</h2></div>
+
+        <div th:if="${#lists.isEmpty(listaRecetas)}" class="empty-state">
+            <div class="emoji">🍽️</div>
+            <h3>Todavía no hay recetas</h3>
+            <p>Cuando se añada la primera, aparecerá aquí.</p>
         </div>
 
-        <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
-    </div>
+        <div class="row g-3" th:unless="${#lists.isEmpty(listaRecetas)}">
+            <div class="col-lg-6" th:each="receta : ${listaRecetas}">
+                <article class="app-card h-100">
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <h3 class="h5 mb-0" th:text="${receta.nombreReceta}">Nombre</h3>
+                        <span sec:authorize="hasRole('admin')" class="app-badge">#<span th:text="${receta.idReceta}">1</span></span>
+                    </div>
+                    <p class="text-muted mb-2" th:text="${receta.descripcion}">Descripción</p>
+                    <p class="mb-1"><strong>Ingredientes:</strong> <span th:text="${receta.ingredientesFormateados}"></span></p>
+                    <p class="mb-3"><strong>Instrucciones:</strong> <span th:text="${receta.instrucciones}"></span></p>
 
-    
-    <footer class="bg-light text-center py-3 mt-5">
-        <div class="container">
-            <span class="text-muted">© 2026 FitMealApp. Todos los derechos reservados.</span>
+                    <div class="d-flex flex-wrap gap-2 align-items-end">
+                        <form th:action="@{/asignarReceta}" method="post" class="d-flex flex-wrap gap-2 align-items-end flex-grow-1">
+                            <input type="hidden" name="idReceta" th:value="${receta.idReceta}">
+                            <div>
+                                <label class="form-label small mb-0" th:for="'usuario-' + ${receta.idReceta}">Usuario</label>
+                                <select class="form-select form-select-sm" th:id="'usuario-' + ${receta.idReceta}" name="idUsuario" required>
+                                    <option th:each="usuario : ${usuarios}" th:value="${usuario.idUser}" th:text="${usuario.nombre}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label small mb-0" th:for="'fecha-' + ${receta.idReceta}">Fecha</label>
+                                <input type="date" class="form-control form-control-sm" th:id="'fecha-' + ${receta.idReceta}" name="fecha" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Asignar</button>
+                        </form>
+                        <form sec:authorize="hasRole('admin')" th:action="@{/admin/eliminar-receta}" method="post"
+                              data-confirm="¿Eliminar esta receta?">
+                            <input type="hidden" name="idReceta" th:value="${receta.idReceta}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
         </div>
-    </footer>
 
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <nav th:if="${totalPaginas > 1}" class="mt-4" aria-label="Paginación">
+            <ul class="pagination app-pagination justify-content-center">
+                <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/recetas(pagina=${paginaActual - 1})}">← Anterior</a>
+                </li>
+                <li class="page-item" th:each="numero : ${#numbers.sequence(0, totalPaginas - 1)}"
+                    th:classappend="${numero == paginaActual} ? 'active'">
+                    <a class="page-link" th:href="@{/recetas(pagina=${numero})}" th:text="${numero + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${paginaActual >= totalPaginas - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/recetas(pagina=${paginaActual + 1})}">Siguiente →</a>
+                </li>
+            </ul>
+        </nav>
+    </section>
+</main>
+
+<script>
+    function agregarIngrediente() {
+        const contenedor = document.getElementById('ingredientes-container');
+        const fila = document.createElement('div');
+        fila.className = 'row g-2 mb-2 ingrediente';
+        fila.innerHTML = '<div class="col-4"><input type="text" name="cantidad[]" class="form-control" placeholder="Cantidad" required></div>' +
+                         '<div class="col-8"><input type="text" name="ingrediente[]" class="form-control" placeholder="Ingrediente" required></div>';
+        contenedor.appendChild(fila);
+    }
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
- 
-
- 

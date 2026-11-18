@@ -1,166 +1,321 @@
-/* Estilo global para todo el sitio */
-
-/* Reset básico de márgenes y padding */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* =========================================================
+   FitMealApp · Sistema de diseño "verde fresco"
+   ========================================================= */
+:root {
+  --verde-900: #123d27;
+  --verde-800: #1b5637;
+  --verde-700: #2c7a4b;
+  --verde-600: #3d9963;
+  --verde-500: #57b87c;
+  --verde-100: #e7f5ec;
+  --verde-050: #f3faf5;
+  --crema: #fcfbf6;
+  --tinta: #1e3327;
+  --muted: #6b7f72;
+  --borde: #dfe9e1;
+  --blanco: #ffffff;
+  --rojo: #c0392b;
+  --rojo-claro: #fdecea;
+  --sombra: 0 8px 30px rgba(28, 82, 49, .08);
+  --sombra-hover: 0 14px 36px rgba(28, 82, 49, .14);
+  --radio: 16px;
+  --radio-sm: 10px;
 }
 
-/* Fuente global */
+/* ---------- Reset y base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    background-color: #f4f7fb; /* Fondo suave gris claro */
-    color: #333; /* Color de texto oscuro para mejor legibilidad */
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  color: var(--tinta);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(87, 184, 124, .10), transparent 38%),
+    radial-gradient(circle at 88% 8%, rgba(255, 214, 140, .12), transparent 32%),
+    var(--crema);
+  line-height: 1.6;
+}
+main { flex: 1 0 auto; }
+h1, h2, h3, h4 { font-weight: 800; letter-spacing: -.02em; color: var(--verde-900); }
+h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+a { color: var(--verde-700); text-decoration: none; }
+a:hover { color: var(--verde-900); }
+:focus-visible { outline: 3px solid rgba(87, 184, 124, .55); outline-offset: 2px; }
+
+/* ---------- Navbar ---------- */
+.app-navbar {
+  background: rgba(255, 255, 255, .92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--borde);
+  box-shadow: 0 2px 14px rgba(28, 82, 49, .05);
+  padding: .7rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--verde-900) !important;
+  letter-spacing: -.03em;
+}
+.app-brand span:last-child span { color: var(--verde-600); }
+.app-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: var(--verde-100);
+  font-size: 1.2rem;
+}
+.app-nav-link {
+  display: block;
+  padding: .55rem .9rem !important;
+  border-radius: 10px;
+  font-weight: 700;
+  color: var(--muted) !important;
+  transition: .2s ease;
+}
+.app-nav-link:hover { background: var(--verde-050); color: var(--verde-800) !important; }
+.app-nav-link.active { background: var(--verde-100); color: var(--verde-800) !important; }
+.app-user {
+  font-weight: 800;
+  font-size: .85rem;
+  color: var(--verde-800);
+  background: var(--verde-050);
+  border: 1px solid var(--borde);
+  padding: .3rem .7rem;
+  border-radius: 999px;
+}
+.navbar-toggler { border-color: var(--borde); }
+.navbar-toggler-icon { filter: invert(.35) sepia(.2) saturate(2) hue-rotate(80deg); }
+
+/* ---------- Botones ---------- */
+.btn { border-radius: 10px; font-weight: 700; padding: .55rem 1.15rem; transition: .2s ease; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--verde-700), var(--verde-600));
+  border: none;
+  box-shadow: 0 4px 14px rgba(44, 122, 75, .25);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: linear-gradient(135deg, var(--verde-800), var(--verde-700));
+  transform: translateY(-1px);
+}
+.btn-soft {
+  background: var(--verde-100);
+  color: var(--verde-800);
+  border: 1px solid transparent;
+}
+.btn-soft:hover { background: var(--verde-700); color: #fff; }
+.btn-outline-danger { border-color: #e6b4ad; color: var(--rojo); }
+.btn-outline-danger:hover { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+.btn-danger { background: var(--rojo); border-color: var(--rojo); }
+.btn-secondary { background: #edf2ee; border: 1px solid var(--borde); color: var(--muted); }
+.btn-secondary:hover { background: var(--verde-100); color: var(--verde-800); }
+
+/* ---------- Tarjetas y superficies ---------- */
+.app-card {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.6rem;
+  transition: .25s ease;
+}
+.app-card:hover { box-shadow: var(--sombra-hover); transform: translateY(-2px); }
+.app-card-flat { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 1.5rem; }
+.section-title { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.3rem; }
+.section-title .emoji { font-size: 1.5rem; }
+.section-subtitle { color: var(--muted); font-weight: 600; margin-bottom: 1.5rem; }
+
+/* ---------- Etiquetas y badges ---------- */
+.app-badge {
+  display: inline-block;
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  background: var(--verde-100);
+  color: var(--verde-800);
+}
+.app-badge-admin { background: #fff3d6; color: #8a5a00; }
+.app-badge-user { background: #e8f0fb; color: #24548c; }
+
+/* ---------- Alertas / mensajes ---------- */
+.app-alert {
+  border-radius: var(--radio-sm);
+  padding: .9rem 1.1rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  margin-bottom: 1rem;
+}
+.app-alert-ok { background: var(--verde-100); color: var(--verde-800); border-color: #c8e6d2; }
+.app-alert-error { background: var(--rojo-claro); color: var(--rojo); border-color: #f3c9c2; }
+
+/* ---------- Formularios ---------- */
+.form-label { font-weight: 800; color: var(--verde-900); margin-bottom: .3rem; }
+.form-control, .form-select {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: .65rem .85rem;
+  font-family: inherit;
+  background: var(--blanco);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--verde-500);
+  box-shadow: 0 0 0 4px rgba(87, 184, 124, .16);
+}
+.form-filter {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.1rem 1.3rem;
+  box-shadow: var(--sombra);
 }
 
-/* Navbar */
-.navbar {
-    background-color: #6c757d; /* Gris suave para el navbar */
+/* ---------- Tablas ---------- */
+.app-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: var(--radio-sm); }
+.app-table thead th {
+  background: var(--verde-050);
+  color: var(--verde-900);
+  font-weight: 800;
+  border-bottom: 2px solid var(--borde);
+  padding: .85rem 1rem;
+}
+.app-table tbody td { padding: .9rem 1rem; border-bottom: 1px solid var(--borde); vertical-align: middle; }
+.app-table tbody tr:last-child td { border-bottom: none; }
+.app-table tbody tr:hover { background: var(--verde-050); }
+
+/* ---------- Listas ---------- */
+.app-list { list-style: none; margin: 0; padding: 0; }
+.app-list li {
+  padding: .9rem 1rem;
+  border-bottom: 1px solid var(--borde);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.app-list li:last-child { border-bottom: none; }
+.app-list li:hover { background: var(--verde-050); }
+.item-name { font-weight: 800; color: var(--verde-900); }
+.item-meta { color: var(--muted); font-size: .85rem; }
+.item-qty { font-weight: 800; color: var(--verde-700); white-space: nowrap; }
+
+/* ---------- Estado vacío ---------- */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  background: rgba(255, 255, 255, .6);
+}
+.empty-state .emoji { font-size: 2.6rem; }
+.empty-state h3 { margin-top: .6rem; }
+.empty-state p { color: var(--muted); margin-bottom: 0; }
+
+/* ---------- Hero / portada ---------- */
+.hero {
+  background: linear-gradient(135deg, var(--verde-800), var(--verde-600));
+  color: #fff;
+  border-radius: 24px;
+  padding: clamp(2rem, 6vw, 4rem);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--sombra-hover);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px; top: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .08);
+}
+.hero h1 { color: #fff; max-width: 700px; }
+.hero p { font-size: 1.1rem; opacity: .92; max-width: 620px; }
+.hero .btn { background: #fff; color: var(--verde-800); border: none; }
+.hero .btn:hover { background: var(--verde-050); color: var(--verde-900); }
+.feature-card { text-align: center; height: 100%; }
+.feature-card .icon {
+  width: 58px; height: 58px;
+  margin: 0 auto .8rem;
+  display: grid; place-items: center;
+  border-radius: 18px;
+  background: var(--verde-100);
+  font-size: 1.7rem;
+}
+.app-carousel { border-radius: var(--radio); overflow: hidden; box-shadow: var(--sombra); max-width: 900px; margin: 0 auto; }
+.app-carousel img { width: 100%; height: clamp(260px, 42vw, 460px); object-fit: cover; }
+
+/* ---------- Login ---------- */
+.login-wrap { min-height: 70vh; display: grid; place-items: center; padding: 2rem 1rem; }
+.login-card {
+  width: 100%; max-width: 420px;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 22px;
+  box-shadow: var(--sombra-hover);
+  overflow: hidden;
+}
+.login-head {
+  background: linear-gradient(135deg, var(--verde-800), var(--verde-600));
+  color: #fff;
+  padding: 1.8rem;
+  text-align: center;
+}
+.login-head h1 { color: #fff; font-size: 1.7rem; margin: .4rem 0 0; }
+.login-body { padding: 1.8rem; }
+
+/* ---------- Paginación ---------- */
+.app-pagination .page-link {
+  border: none;
+  border-radius: 9px;
+  margin: 0 .15rem;
+  color: var(--verde-800);
+  font-weight: 800;
+  background: var(--blanco);
+}
+.app-pagination .active .page-link { background: var(--verde-700); color: #fff; }
+.app-pagination .disabled .page-link { color: #b6c4ba; pointer-events: none; }
+
+/* ---------- Footer ---------- */
+.app-footer {
+  background: var(--verde-900);
+  color: rgba(255, 255, 255, .75);
+  padding: 1.4rem 0;
+  font-size: .9rem;
+  margin-top: auto;
+}
+.app-footer a { color: var(--verde-500); font-weight: 800; }
+.app-footer a:hover { color: #fff; }
+
+/* ---------- Utilidades ---------- */
+.page-heading { margin: 2.2rem 0 1.8rem; }
+.page-heading p { color: var(--muted); margin-bottom: 0; }
+.stack > * + * { margin-top: 1rem; }
+.clickable-row { cursor: default; }
+.qty-check { accent-color: var(--verde-600); width: 1.15rem; height: 1.15rem; }
+
+/* ---------- Impresión de la lista de la compra ---------- */
+@media print {
+  body { background: #fff; }
+  .app-navbar, .app-footer, .form-filter, .no-print { display: none !important; }
+  .app-card { box-shadow: none; border: 1px solid #ccc; }
+  main { padding: 0 !important; }
 }
 
-.navbar a {
-    color: #343a40 !important; /* Gris oscuro para el texto del navbar */
-}
-
-.navbar a:hover {
-    color: #fff !important; /* Blanco al pasar el ratón sobre el enlace */
-    background-color: #0d4e18; /* Fondo azul al pasar el ratón */
-}
-
-/* Botón Iniciar sesión */
-.navbar .btn-primary {
-    color: #fff; /* Color blanco para el texto */
-    background-color: #007bff; /* Fondo azul para el botón */
-    border: none;
-}
-
-.navbar .btn-primary:hover {
-    background-color: #0d4e18; /* Fondo azul más oscuro al pasar el ratón */
-    color: #fff; /* Asegura que el texto siga siendo blanco */
-}
-
-/* Carrusel */
-.carousel-inner img {
-    width: 600px;
-    height: 600px; /* Ajusta la altura según lo necesites */
-    object-fit: cover;
-    
-}
-#carouselExample {
-    max-width: 90%; /* Ajusta el porcentaje según lo necesites */
-    margin: 0 auto; /* Centra el carrusel */
-    border-radius: 5px;
-}
-/* Botones */
-.btn {
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
-
-.btn:hover {
-    background-color: #00060c; /* Azul claro al pasar el ratón */
-}
-
-/* Footer */
-footer {
-    background-color: #e9ecef; /* Fondo gris suave para el footer */
-    color: #777;
-    padding: 10px;
-    margin-top: 20px;
-}
-
-footer span {
-    font-size: 0.9em;
-}
-
-/* Contenedor principal */
-.container {
-    padding: 20px;
-}
-
-
-
-*{
-    margin: 0px;
-    padding: 0px;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-body {
-    background-color: #f4f7fb; /* Fondo suave gris claro */
-}
-
-form.F1 {
-    width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10%;
-    border: rgb(7, 0, 0) 1px solid;
-    border-radius: 5px;
-}
-
-form.F1 > div{
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-form.F1 > div:nth-child(1) > p {
-    margin-top: 15px;
-    margin-bottom: 25px; 
-    font-size: 40px;
-    color: rgb(255, 255, 255);
-}
-
-form.F1 > div:nth-child(5) > p {
-    font-size: 16px;
-    color: rgb(247, 89, 89);
-    margin-bottom: 15px;
-}
-
-form.F1 > div > label{
-    display: inline-block;
-    width: 100px;
-    text-align: right;
-    padding: 10px;
-    font-size: 18px;
-    color:rgb(5, 0, 0);
-}
-
-form.F1 > div > input[type="text"], form.F1 > div > input[type="password"] {
-    width: 200px;
-    padding: 10px;
-    font-size: 16px;
-    outline: none;
-    border: white 1px solid;
-    border-radius: 5px;
-}
-
-form.F1 > div > input[type="text"]:focus, form.F1 > div > input[type="password"]:focus {
-    border-color: rgb(100, 100, 100);
-    border-width: 2px;
-    padding: 9px;
-  
-}   
-
-form.F1 > div > input[type="submit"] {
-    
-    margin-top: 15px;
-    margin-bottom: 15px;
-    width: 80px;
-    height: 40px;
-    background-color:black;
-    font-size: 16px;
-    border-radius: 5px;
-    outline: none;
-    border: 0px;
-    color:white;
-}
-
-form.F1 > div > input[type="submit"]:hover, form.F1 > div > input[type="submit"]:focus {
-    background-color:black;
-    cursor:pointer;
-    color:white;
-    background-color:rgb(90, 90, 90);
+/* ---------- Responsive ---------- */
+@media (max-width: 576px) {
+  .app-card { padding: 1.1rem; }
+  .hero { padding: 1.6rem; }
+  .app-user { display: none; }
 }

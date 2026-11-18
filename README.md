@@ -27,7 +27,7 @@ Incluye autenticación con dos roles (`usuario` y `admin`), gestión de recetas,
 | Plantillas | Thymeleaf + thymeleaf-extras-springsecurity6 |
 | Base de datos | MySQL 8 (conector JDBC 8.0.33) |
 | Serialización | Jackson (ingredientes en formato JSON) |
-| Frontend | Bootstrap 5, CSS propio, JavaScript |
+| Frontend | Thymeleaf + Bootstrap 5 + sistema de diseño propio (verde fresco), JS para confirmaciones |
 | Build | Maven (wrapper incluido) |
 | Despliegue | WAR para Apache Tomcat 10.1+ (Jakarta EE) |
 | Monitoreo | Spring Boot Actuator |
@@ -216,8 +216,11 @@ src/main/java/es/dsw/
 
 src/main/resources/
 ├── application.properties           # DataSource/HikariCP + parámetros BD
-├── static/                          # css e imágenes del carrusel
-└── templates/                       # vistas Thymeleaf (8 plantillas)
+├── static/css/styles.css            # sistema de diseño "verde fresco"
+├── static/images/                   # imágenes del carrusel
+└── templates/
+    ├── fragments/layout.html        # head, navbar, flash, footer y scripts compartidos
+    └── (8 vistas que usan el layout)
 
 src/main/resources/db/migration/    # V1__init.sql (Flyway)
 src/test/                            # 16 tests JUnit 5 con H2 + MockMvc
@@ -250,6 +253,7 @@ pom.xml                              # dependencias Maven
 - **Errores de API en JSON**: `@RestControllerAdvice` propio devuelve `ApiError` con códigos 400/404/409/500 (JSON malformado, validación, duplicados…), separado del manejo HTML de las vistas MVC.
 - **Paginación**: `/recetas` y `/api/recetas?page=&size=&sort=` devuelven páginas (`PaginaDTO` en la API).
 - **Docker**: `docker compose up --build` levanta MariaDB y la app con un solo comando.
+- **Frontend unificado**: layout compartido con Thymeleaf fragments (navbar, mensajes flash, footer y scripts), sistema de diseño verde fresco, diseño responsive, estados vacíos, confirmaciones antes de borrar y lista de la compra imprimible.
 - **Arquitectura por capas**: entidades **JPA** (`@Entity`) → repositorios **Spring Data JPA** → servicios → controladores. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot. Las consultas JOIN/agregadas se resuelven con proyecciones nativas tipadas.
 - **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
 - **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.
