@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,7 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.dsw.dtos.ApiError;
 import es.dsw.dtos.IngredienteDTO;
+import es.dsw.dtos.PaginaDTO;
 import es.dsw.dtos.RecetaDTO;
 import es.dsw.dtos.RecetaRequest;
 import es.dsw.dtos.UsuarioDTO;
@@ -47,16 +53,26 @@ public class ApiController {
 	}
 
 	@GetMapping("/recetas")
-	@Operation(summary = "Listar recetas")
-	public List<RecetaDTO> listarRecetas() {
-		return recetasService.findAll().stream().map(this::toDTO).toList();
+	@Operation(summary = "Listar recetas (paginado)")
+	public PaginaDTO<RecetaDTO> listarRecetas(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "idReceta") String sort) {
+
+		Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), Sort.by(sort));
+		Page<RecetaDTO> pagina = recetasService.findAll(pageable).map(this::toDTO);
+		return new PaginaDTO<>(pagina.getContent(), pagina.getNumber(), pagina.getSize(),
+				pagina.getTotalElements(), pagina.getTotalPages());
 	}
 
 	@GetMapping("/recetas/{id}")
 	@Operation(summary = "Obtener una receta por id")
-	public ResponseEntity<RecetaDTO> receta(@PathVariable int id) {
+	public ResponseEntity<Object> receta(@PathVariable int id) {
 		Recetas receta = recetasService.findById(id);
-		return receta == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(toDTO(receta));
+		return receta == null
+				? ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(ApiError.of(404, "No encontrado", "No existe una receta con id " + id))
+				: ResponseEntity.ok(toDTO(receta));
 	}
 
 	@GetMapping("/usuarios")

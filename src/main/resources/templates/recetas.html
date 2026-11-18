@@ -149,6 +149,23 @@
                     </li>
                 </th:block>
             </ul>
+
+            <nav th:if="${totalPaginas > 1}" class="mt-4" aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/recetas(pagina=${paginaActual - 1})}">Anterior</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="numero : ${#numbers.sequence(0, totalPaginas - 1)}"
+                        th:classappend="${numero == paginaActual} ? 'active'">
+                        <a class="page-link" th:href="@{/recetas(pagina=${numero})}"
+                           th:text="${numero + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${paginaActual >= totalPaginas - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/recetas(pagina=${paginaActual + 1})}">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <a href="/" class="btn btn-secondary mt-4">Volver a Inicio</a>
@@ -157,7 +174,7 @@
     
     <footer class="bg-light text-center py-3 mt-5">
         <div class="container">
-            <span class="text-muted">© 2025 FitMealApp. Todos los derechos reservados.</span>
+            <span class="text-muted">© 2026 FitMealApp. Todos los derechos reservados.</span>
         </div>
     </footer>
 

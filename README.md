@@ -200,7 +200,9 @@ src/main/java/es/dsw/
 │   ├── RecetaDTO.java
 │   ├── UsuarioDTO.java
 │   ├── IngredienteDTO.java
-│   └── RecetaRequest.java
+│   ├── RecetaRequest.java
+│   ├── ApiError.java
+│   └── PaginaDTO.java
 ├── repositories/                    # Spring Data JPA (interfaces + proyecciones nativas)
 │   ├── UsuariosRepository.java
 │   ├── RecetasRepository.java
@@ -221,6 +223,8 @@ src/main/resources/db/migration/    # V1__init.sql (Flyway)
 src/test/                            # 16 tests JUnit 5 con H2 + MockMvc
 .github/workflows/ci.yml             # CI: build + tests en cada push
 SQL.txt                              # esquema, índices y datos de ejemplo
+Dockerfile                           # build multi-stage (Maven + JRE)
+docker-compose.yml                   # app + MariaDB en un solo comando
 pom.xml                              # dependencias Maven
 ```
 
@@ -243,6 +247,9 @@ pom.xml                              # dependencias Maven
 - **CI**: GitHub Actions ejecuta `./mvnw -B clean verify` en cada push a `master`.
 - **Acceso por roles reforzado**: todo `/admin/**` exige `ROLE_admin` (un test detectó que crear usuarios solo pedía autenticación).
 - **API REST documentada**: controlador `/api` con DTOs (`RecetaDTO`, `UsuarioDTO`, `IngredienteDTO`), validación y **Swagger/OpenAPI**.
+- **Errores de API en JSON**: `@RestControllerAdvice` propio devuelve `ApiError` con códigos 400/404/409/500 (JSON malformado, validación, duplicados…), separado del manejo HTML de las vistas MVC.
+- **Paginación**: `/recetas` y `/api/recetas?page=&size=&sort=` devuelven páginas (`PaginaDTO` en la API).
+- **Docker**: `docker compose up --build` levanta MariaDB y la app con un solo comando.
 - **Arquitectura por capas**: entidades **JPA** (`@Entity`) → repositorios **Spring Data JPA** → servicios → controladores. El acceso a datos usa un **pool HikariCP** gestionado por Spring Boot. Las consultas JOIN/agregadas se resuelven con proyecciones nativas tipadas.
 - **JSON seguro**: los ingredientes se serializan con **Jackson** (nunca concatenando texto), así que admiten comillas y caracteres especiales.
 - **Validación y errores**: **Bean Validation** en los formularios, `nombre` de usuario `UNIQUE`, `@ControllerAdvice` global y logging con **SLF4J** en lugar de `System.out.println`.
@@ -254,8 +261,8 @@ pom.xml                              # dependencias Maven
 
 Aspectos que se abordarían en un entorno profesional:
 
-- Añadir paginación en los listados.
 - Sustituir las proyecciones nativas por relaciones JPA completas (`@ManyToOne`) si el modelo crece.
+- Añadir búsqueda/filtros en el listado de recetas.
 
 ---
 

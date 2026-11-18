@@ -7,13 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import es.dsw.controllers.MainController;
 import jakarta.validation.ConstraintViolationException;
 
 /**
  * Centraliza el tratamiento de errores de los controladores MVC y evita que
  * se muestren trazas o mensajes técnicos al visitante.
  */
-@ControllerAdvice
+@ControllerAdvice(assignableTypes = MainController.class)
 public class GlobalExceptionHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);

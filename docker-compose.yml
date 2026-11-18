@@ -1,0 +1,26 @@
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: recetas_app
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FITMEAL_DB_URL: jdbc:mysql://db:3306/recetas_app?useUnicode=true&characterEncoding=utf8
+      FITMEAL_DB_USER: root
+      FITMEAL_DB_PASSWORD: 1234
+      FITMEAL_DB_DRIVER: com.mysql.cj.jdbc.Driver
+    ports:
+      - "8080:8080"

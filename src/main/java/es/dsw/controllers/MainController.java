@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -86,13 +88,18 @@ public class MainController {
 	}
 
 	@GetMapping("/recetas")
-	public String mostrarRecetas(Model model) {
+	public String mostrarRecetas(
+			@RequestParam(defaultValue = "0") int pagina,
+			@RequestParam(defaultValue = "9") int tamano,
+			Model model) {
 		String usuario = (String) model.getAttribute("usuario");
 		String rol = (String) model.getAttribute("rol");
 		Integer idUsuarioObj = (Integer) model.getAttribute("idUsuario");
 		int idUsuario = (idUsuarioObj != null) ? idUsuarioObj : -1;
 
-		List<Recetas> listaRecetas = recetasService.findAll();
+		var paginaRecetas = recetasService.findAll(
+				PageRequest.of(Math.max(pagina, 0), Math.max(tamano, 1), Sort.by("idReceta")));
+		List<Recetas> listaRecetas = paginaRecetas.getContent();
 		ArrayList<Users> listaUsuarios = new ArrayList<>(usuariosService.findAll());
 		List<Planificador> recetasAsignadas = planificadorService.findRecetasConUsuarios();
 
@@ -101,6 +108,8 @@ public class MainController {
 		model.addAttribute("idUsuario", idUsuario);
 		model.addAttribute("usuarios", listaUsuarios);
 		model.addAttribute("listaRecetas", listaRecetas);
+		model.addAttribute("paginaActual", paginaRecetas.getNumber());
+		model.addAttribute("totalPaginas", paginaRecetas.getTotalPages());
 		model.addAttribute("recetasAsignadas", recetasAsignadas);
 
 		return "recetas";

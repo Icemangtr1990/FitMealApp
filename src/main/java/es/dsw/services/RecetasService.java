@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,10 @@ public class RecetasService {
 
 	public List<Recetas> findAll() {
 		return repository.findAll();
+	}
+
+	public Page<Recetas> findAll(Pageable pageable) {
+		return repository.findAll(pageable);
 	}
 
 	public Recetas findById(int idReceta) {
